@@ -1109,6 +1109,10 @@
         .tile::before { background: var(--pc, var(--sc, #5d6f7d)); box-shadow: 0 0 10px var(--pc, transparent); }
         .tile .tile-n { color: color-mix(in srgb, var(--pc, #9fb3c0) 70%, #cfe3ea); }
         .tile { background-image: linear-gradient(100deg, color-mix(in srgb, var(--pc, transparent) 9%, transparent), transparent 55%); }
+        .tile::before { width: 4px; top: 10px; bottom: 10px; background: var(--pc, var(--sc, #5d6f7d)); box-shadow: 0 0 6px var(--pc, transparent), 0 0 16px var(--pc, transparent), 0 0 26px color-mix(in srgb, var(--pc, transparent) 55%, transparent); }
+        .tile .tile-n { color: var(--pc, #9fb3c0); text-shadow: 0 0 10px color-mix(in srgb, var(--pc, transparent) 70%, transparent); }
+        .tile { background-image: linear-gradient(100deg, color-mix(in srgb, var(--pc, transparent) 20%, transparent), transparent 62%); border-color: color-mix(in srgb, var(--pc, #5cc9de) 38%, transparent); box-shadow: 0 0 14px color-mix(in srgb, var(--pc, transparent) 14%, transparent), inset 0 0 18px color-mix(in srgb, var(--pc, transparent) 7%, transparent); }
+        .tile.warn { border-color: rgba(230,198,119,0.6); } .tile.crit { border-color: rgba(239,107,122,0.7); }
 </style>
 </head>
 <body>
