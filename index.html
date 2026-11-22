@@ -1124,6 +1124,9 @@
         .tile-i { font-size: 0.62rem; margin-top: 1px; }
         .tile { min-height: 0; padding-top: 9px; padding-bottom: 8px; }
         body { padding-bottom: calc(130px + env(safe-area-inset-bottom, 0px)) !important; }
+        .gt-res2 { padding: 4px 12px; border-radius: 14px; background: rgba(92,201,222,0.08); border: 1px dashed rgba(92,201,222,0.35); margin-bottom: 8px; }
+        .gt-kv { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; padding: 8px 0; } .gt-kv + .gt-kv { border-top: 1px solid rgba(92,201,222,0.15); }
+        .gt-kv span { font-size: 0.88rem; color: #cfeaf0; } .gt-kv b { font-size: 1.15rem; color: #4fe0b0; white-space: nowrap; } .gt-msg { padding: 8px 0; font-size: 0.85rem; color: var(--text-muted); }
 </style>
 </head>
 <body>
@@ -1644,7 +1647,7 @@
             if (lv) { const r = valScore('sal', lv.v), d = new Date(lv.ts); status = `<div class="salt-now" style="--sc:${r.lvl === 0 ? '#4fd6a4' : r.lvl === 1 ? '#e6c677' : '#ef6b7a'}"><span>Aktuell im Becken</span><b>${fmtNum(lv.v)} psu</b><small>${lvlLabel(r.lvl)} · gemessen ${pad2(d.getDate())}.${pad2(d.getMonth() + 1)}.</small></div>`; }
             else status = '<div class="salt-now" style="--sc:#5d6f7d"><span>Aktuell im Becken</span><b>–</b><small>Noch keine Messung. <a href="#" onclick="navGo(\'input\');return false;" style="color:var(--neon)">Jetzt messen</a></small></div>';
             let h = `<div class="salt-title">💧 Salzwasser</div>${status}
-                <div class="seg" role="group"><button type="button" class="${saltSeg === 'make' ? 'active' : ''}" onclick="setSaltSeg('make')">Ansetzen</button><button type="button" class="${saltSeg === 'top' ? 'active' : ''}" onclick="setSaltSeg('top')">Aufsalzen</button></div><div id="saltRes"></div>`;
+                <div class="seg" role="group"><button type="button" class="${saltSeg === 'make' ? 'active' : ''}" onclick="setSaltSeg('make')">Ansetzen</button><button type="button" class="${saltSeg === 'top' ? 'active' : ''}" onclick="setSaltSeg('top')">Korrigieren</button></div><div id="saltRes"></div>`;
             if (saltSeg === 'make') {
                 const wc = V > 0 ? [10, 20, 30].map(p => saltChip(V * p / 100, `${p} % (${fmtNum(Math.round(V * p) / 100)} L)`)).join('') : '';
                 h += `<div class="rec-meta" style="margin:-4px 0 6px">Salzwasser für Neuansatz oder Wasserwechsel. Rezept: ${escapeHtml(saltCfg.name)}.</div>
@@ -2811,7 +2814,7 @@
             target: { ca: 425, kh: 7.8, po4: 0.05, no3: 5 },
             recheck: { sal: '12–24 Stunden', kh: '12–24 Stunden', ca: '24 Stunden', mg: '24 Stunden', no3: '3–7 Tagen', po4: '3–7 Tagen', temp: '24 Stunden', ph: '24 Stunden' },
             recheckMs: { sal: 1, kh: 1, ca: 1, mg: 1, no3: 3, po4: 3, temp: 1, ph: 1 },
-            slots: { sal: ['up'], kh: ['up'], ca: ['up'], mg: ['up'], no3: ['down', 'up'], po4: ['down', 'up'] }
+            slots: { sal: ['up', 'down'], kh: ['up'], ca: ['up'], mg: ['up'], no3: ['down', 'up'], po4: ['down', 'up'] }
         };
 
         // ===== Eigene Sollwerte =====
@@ -3352,6 +3355,7 @@
         }
 
         function productReady(k, dir) {
+            if (k === 'sal') return appSettings.volume > 0;
             const p = appSettings.products[k + '_' + dir];
             return !!(p && p.name && p.effect > 0 && appSettings.volume > 0);
         }
@@ -3648,7 +3652,7 @@
         function saveDosing() { try { localStorage.setItem('pepeaqua_dosing', JSON.stringify(dosingLog)); } catch (e) {} }
         const DOSE_PARAMS = ['kh', 'ca', 'mg', 'no3', 'po4'];
         const DOSE_DOWN = DOWN_DOSE.map(k => k + '_down');
-        let doseRange = 30, doseSel = new Set(['aio', ...DOSE_PARAMS, ...DOSE_DOWN]), doseHover = null;
+        let doseRange = 30, doseSel = new Set(['aio', 'sal', 'sal_down', ...DOSE_PARAMS, ...DOSE_DOWN]), doseHover = null;
         function logDose(slot, v) {
             const last = doseEvents(keyOfSlot(slot)).pop();
             if (last ? last.v === v : v === 0) return;
@@ -3674,6 +3678,7 @@
         function doseActive() {
             const out = [], pr = appSettings.products || {};
             if ((pr.aio_up && pr.aio_up.daily > 0) || dosingLog.some(e => e.slot === 'aio_up')) out.push('aio');
+            ['sal', 'sal_down'].forEach(k => { if (dosingLog.some(e => e.slot === (k === 'sal' ? 'sal_up' : k))) out.push(k); });
             DOSE_PARAMS.forEach(k => out.push(k));
             DOSE_DOWN.forEach(k => { const p = pr[k]; if ((p && (p.daily > 0 || p.mode === 'once')) || dosingLog.some(e => e.slot === k)) out.push(k); });
             return out;
@@ -3918,7 +3923,7 @@
             doseActive().forEach(k => {
                 if (!sel.has(k)) return;
                 const pp = (appSettings.products && appSettings.products[slotOfKey(k)]) || {};
-                if (pp.mode === 'once') {
+                if (pp.mode === 'once' || k.indexOf('sal') === 0) {
                     const m = {};
                     dosingLog.forEach(e => { if (e.kind === 'once' && e.slot === slotOfKey(k)) { const dd = startOfDay(e.ts); m[dd] = (m[dd] || 0) + e.v; } });
                     const bp = Object.keys(m).map(Number).filter(dd => dd + DAY_MS > from && dd <= to).sort((a, b) => a - b).map(dd => ({ ts: dd + DAY_MS / 2, v: m[dd] }));
@@ -4028,42 +4033,48 @@
                 <label class="gt"><span class="gt-l">Ziel <em>${cfg.unit}</em></span><span class="gt-v"><input type="number" step="any" inputmode="decimal" id="ct_${slot}" value="${r3(tgt)}" placeholder="–" aria-label="Zielwert" oninput="calcShow('${slot}')" onchange="setZiel('${k}', this.value)"></span></label></div>
                 <div class="gt-res"><div class="calc-res" id="cr_${slot}"></div><button type="button" class="btn-note save" onclick="calcApply('${slot}')">↓ Übernehmen</button></div>`;
         }
-        function saltDoseCalc() {
-            const g = id => { const e = document.getElementById(id); return e ? parseFloat(String(e.value).replace(',', '.')) : NaN; };
-            const V = appSettings.volume, s0 = g('cc_sal_up'), s1 = g('ct_sal_up'), Lr = saltTotalL(), kk = saltCfg.k1 + saltCfg.k2;
-            if (!(V > 0) || !isFinite(s0) || !isFinite(s1)) return { err: 'Bitte Ist- und Zielwert eintragen.' };
-            const d = s1 - s0; if (d <= 0.05) return { err: d < -0.05 ? 'Ziel liegt unter dem Ist-Wert – hier nichts zu dosieren.' : 'Salzgehalt passt, nichts nachzudosieren.' };
-            let a, b;
-            if (saltCfg.mode !== 'exact') { a = V * d * saltCfg.k1 / Lr / saltCfg.psu; b = V * d * saltCfg.k2 / Lr / saltCfg.psu; }
-            else { const C = saltCfg.psu * Lr * 1000 / kk, m = V * 1000 * d / (C - s1); a = m * saltCfg.k1 / kk; b = m * saltCfg.k2 / kk; }
-            return { a, b, d };
+        function saltDoseCalc(dir) {
+            const g = id => { const el = document.getElementById(id); return el ? parseFloat(String(el.value).replace(',', '.')) : NaN; };
+            const V = appSettings.volume, s0 = g('cc_sal_' + dir), s1 = g('ct_sal_' + dir), Lr = saltTotalL(), kk = saltCfg.k1 + saltCfg.k2;
+            if (!(V > 0) || !isFinite(s0) || !isFinite(s1) || s0 <= 0) return { err: 'Bitte Ist- und Zielwert eintragen.' };
+            const d = s1 - s0;
+            if (dir === 'up') {
+                if (d <= 0.05) return { err: d < -0.05 ? 'Ziel liegt unter dem Ist-Wert – dafür oben „Salzgehalt senken“ nutzen.' : 'Salzgehalt passt, nichts nachzudosieren.' };
+                let a, b;
+                if (saltCfg.mode !== 'exact') { a = V * d * saltCfg.k1 / Lr / saltCfg.psu; b = V * d * saltCfg.k2 / Lr / saltCfg.psu; }
+                else { const C = saltCfg.psu * Lr * 1000 / kk, m = V * 1000 * d / (C - s1); a = m * saltCfg.k1 / kk; b = m * saltCfg.k2 / kk; }
+                return { a, b, d };
+            }
+            if (d >= -0.05) return { err: d > 0.05 ? 'Ziel liegt über dem Ist-Wert – dafür „Salzgehalt erhöhen“ nutzen.' : 'Salzgehalt passt, nichts zu tauschen.' };
+            return { w: V * (1 - s1 / s0) * 1000, d };
         }
-        function saltDoseShow() {
-            const o = document.getElementById('cr_sal_up'); if (!o) return;
-            const r = saltDoseCalc(), f = x => fmtNum(Math.round(x * 10) / 10);
-            if (r.err) { o.innerHTML = r.err; return; }
-            o.innerHTML = `Konzentrat 1: <b>${f(r.a)} ml</b> · Konzentrat 2: <b>${f(r.b)} ml</b>` + (r.d > 1 ? `<div class="rec-warn" style="margin-top:6px">+${f(r.d)} psu: besser höchstens ca. 1 psu pro Tag.</div>` : '');
+        function saltDoseShow(dir) {
+            const o = document.getElementById('cr_sal_' + dir); if (!o) return;
+            const r = saltDoseCalc(dir), f = x => fmtNum(Math.round(x * 10) / 10), row = (l, v) => `<div class="gt-kv"><span>${l}</span><b>${v}</b></div>`;
+            if (r.err) { o.innerHTML = `<div class="gt-msg">${r.err}</div>`; return; }
+            const warn = Math.abs(r.d) > 1 ? `<div class="rec-warn" style="margin-top:6px">${r.d > 0 ? '+' : '−'}${f(Math.abs(r.d))} psu: besser höchstens ca. 1 psu pro Tag.</div>` : '';
+            o.innerHTML = (dir === 'up' ? row('Konzentrat 1', f(r.a) + ' ml') + row('Konzentrat 2', f(r.b) + ' ml') : row('Beckenwasser entnehmen', f(r.w) + ' ml') + row('Osmosewasser auffüllen', f(r.w) + ' ml')) + warn;
         }
-        function saltDoseAdd() {
-            const r = saltDoseCalc(); if (r.err) { showToast(r.err, true); return; }
-            const di = document.getElementById('gd_sal_up'), m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(di.value || isoToday());
-            dosingLog.push({ ts: new Date(+m[1], +m[2] - 1, +m[3], 12).getTime(), slot: 'sal_up', v: Math.round((r.a + r.b) * 10) / 10, k1: r.a, k2: r.b, kind: 'once' });
-            saveDosing(); renderProductSettings(); renderDoseChart();
+        function saltDoseAdd(dir) {
+            const r = saltDoseCalc(dir); if (r.err) { showToast(r.err, true); return; }
+            const di = document.getElementById('gd_sal_' + dir), m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(di.value || isoToday());
+            const e = { ts: new Date(+m[1], +m[2] - 1, +m[3], 12).getTime(), slot: 'sal_' + dir, kind: 'once' };
+            if (dir === 'up') Object.assign(e, { v: Math.round((r.a + r.b) * 10) / 10, k1: r.a, k2: r.b }); else e.v = Math.round(r.w);
+            dosingLog.push(e); saveDosing(); renderProductSettings(); renderDoseChart();
             if (typeof renderRecommendations === 'function') renderRecommendations();
-            showToast('✅ Aufsalzen eingetragen');
+            showToast(dir === 'up' ? '✅ Aufsalzen eingetragen' : '✅ Wasserwechsel eingetragen');
         }
-        function saltDoseHtml() {
-            const V = appSettings.volume, lv = latestValue('sal'), e = effectiveThr('sal'), r3 = x => Math.round(x * 100) / 100;
-            const tgt = e.target !== undefined ? e.target : (e.minOpt + e.maxOpt) / 2;
-            const dateT = `<label class="gt"><span class="gt-l">Datum</span><input type="date" id="gd_sal_up" value="${isoToday()}" aria-label="Datum"></label>`;
-            if (!(V > 0)) return `<div class="step"><div class="step-h">Aufsalzen</div><div class="rec-meta">Trage zuerst oben in der Liste dein Nettovolumen ein.</div></div>`;
-            return `<div class="step"><div class="step-h">Aufsalzen mit Konzentrat 1 + 2</div>
+        function saltDoseHtml(dir) {
+            const V = appSettings.volume, lv = latestValue('sal'), r3 = x => Math.round(x * 100) / 100, up = dir === 'up';
+            const dateT = `<label class="gt"><span class="gt-l">Datum</span><input type="date" id="gd_sal_${dir}" value="${isoToday()}" aria-label="Datum"></label>`;
+            if (!(V > 0)) return `<div class="step"><div class="step-h">${up ? 'Aufsalzen' : 'Salzgehalt senken'}</div><div class="rec-meta">Trage zuerst oben in der Liste dein Nettovolumen ein.</div></div>`;
+            return `<div class="step"><div class="step-h">${up ? 'Aufsalzen mit Konzentrat 1 + 2' : 'Senken per Wasserwechsel (Osmosewasser)'}</div>
                 <div class="gt-row">${dateT}
-                <label class="gt"><span class="gt-l">Ist <em>psu</em></span><span class="gt-v"><input type="number" step="any" inputmode="decimal" id="cc_sal_up" value="${lv ? r3(lv.v) : ''}" placeholder="–" aria-label="Ist-Wert" oninput="saltDoseShow()"></span></label>
-                <label class="gt"><span class="gt-l">Ziel <em>psu</em></span><span class="gt-v"><input type="number" step="any" inputmode="decimal" id="ct_sal_up" value="35" placeholder="–" aria-label="Zielwert" oninput="saltDoseShow()"></span></label></div>
-                <div class="gt-res"><div class="calc-res" id="cr_sal_up"></div></div>
-                <div class="rec-meta">Für ${fmtNum(V)} L Nettovolumen, nach deinem Rezept (${fmtNum(saltCfg.k1)} / ${fmtNum(saltCfg.k2)} ml je ${fmtNum(saltTotalL())} L bei ${fmtNum(saltCfg.psu)} psu). Langsam in mehreren Portionen zugeben.</div>
-                <button type="button" class="btn-note save full big" onclick="saltDoseAdd()">Aufsalzen eintragen</button></div>`;
+                <label class="gt"><span class="gt-l">Ist <em>psu</em></span><span class="gt-v"><input type="number" step="any" inputmode="decimal" id="cc_sal_${dir}" value="${lv ? r3(lv.v) : ''}" placeholder="–" aria-label="Ist-Wert" oninput="saltDoseShow('${dir}')"></span></label>
+                <label class="gt"><span class="gt-l">Ziel <em>psu</em></span><span class="gt-v"><input type="number" step="any" inputmode="decimal" id="ct_sal_${dir}" value="35" placeholder="–" aria-label="Zielwert" oninput="saltDoseShow('${dir}')"></span></label></div>
+                <div class="gt-res2" id="cr_sal_${dir}"></div>
+                <div class="rec-meta">${up ? `Für ${fmtNum(V)} L Nettovolumen, nach deinem Rezept (${fmtNum(saltCfg.k1)} / ${fmtNum(saltCfg.k2)} ml je ${fmtNum(saltTotalL())} L bei ${fmtNum(saltCfg.psu)} psu). Langsam in mehreren Portionen zugeben.` : `Für ${fmtNum(V)} L Nettovolumen. Ist der Wert nur durch Verdunstung gestiegen, reicht regelmäßiges Auffüllen mit Osmosewasser.`}</div>
+                <button type="button" class="btn-note save full big" onclick="saltDoseAdd('${dir}')">${up ? 'Aufsalzen eintragen' : 'Wasserwechsel eintragen'}</button></div>`;
         }
         function doseBlockHtml(slot, p) {
             const u = escapeHtml(p.unit || 'ml'), once = p.mode === 'once';
@@ -4169,8 +4180,8 @@
                 const p = appSettings.products[slot] || {}, cfg = thresholds[k] || { label: 'All4Reef', unit: '' };
                 const title = isAio ? '🧪 All4Reef (A4R)' : `${cfg.label} · ${dir === 'up' ? '⬆️ erhöhen' : '⬇️ senken'}`;
                 let h = `<div class="pd-head"><button type="button" class="back-btn" onclick="closeProd()">‹ Zurück</button><div class="pd-title" style="color:${paramColors[k]}">${title}</div></div>`;
-                if (slot === 'sal_up') {
-                    h += saltDoseHtml();
+                if (slot === 'sal_up' || slot === 'sal_down') {
+                    h += saltDoseHtml(slot.endsWith('_down') ? 'down' : 'up');
                 } else if (isAio) {
                     h += `<div class="step"><div class="step-h">Dosierung</div>${doseBlockHtml(slot, p)}</div>`;
                 } else {
@@ -4191,7 +4202,7 @@
                     if (!hasD) h += `<details class="calc-det"${calcOpen ? ' open' : ''} ontoggle="calcOpen=this.open"><summary>Menge berechnen</summary>${calcHtml(slot, k, dir, p)}</details>`;
                 }
                 root.innerHTML = h;
-                root.querySelectorAll('[id^="cr_"]').forEach(el => { if (el.id === 'cr_sal_up') saltDoseShow(); else calcShow(el.id.slice(3)); });
+                root.querySelectorAll('[id^="cr_"]').forEach(el => { if (el.id.indexOf('cr_sal_') === 0) saltDoseShow(el.id.slice(7)); else calcShow(el.id.slice(3)); });
                 return;
             }
             if (intro) intro.style.display = '';
@@ -4204,7 +4215,7 @@
                     const slot = k + '_' + dir, p = appSettings.products[slot] || {}, cfg = thresholds[k];
                     if (k === 'kh' && dir === 'up') h += row('aio_up', '🧪 All4Reef (A4R)', paramColors.aio, prodSummary('aio_up', a), a.daily > 0 || a.mode === 'once');
                     if (dir === 'up' && p.aio) { h += row('aio_up', `${cfg.label} ⬆️ erhöhen`, paramColors[k], `über All-in-One „${escapeHtml(p.name)}“`, true); return; }
-                    if (slot === 'sal_up') { const lg = dosingLog.filter(x => x.slot === 'sal_up').sort((x, y) => y.ts - x.ts)[0]; h += row(slot, 'Salzgehalt ⬆️ erhöhen', paramColors[k], 'Konzentrat 1 + 2' + (lg ? ' · zuletzt ' + pad2(new Date(lg.ts).getDate()) + '.' + pad2(new Date(lg.ts).getMonth() + 1) + '.' : ''), true); return; }
+                    if (k === 'sal') { const lg = dosingLog.filter(x => x.slot === slot).sort((x, y) => y.ts - x.ts)[0]; h += row(slot, dir === 'up' ? 'Salzgehalt ⬆️ erhöhen' : 'Salzgehalt ⬇️ senken', paramColors[k], (dir === 'up' ? 'Konzentrat 1 + 2' : 'Wasserwechsel (Osmose)') + (lg ? ' · zuletzt ' + pad2(new Date(lg.ts).getDate()) + '.' + pad2(new Date(lg.ts).getMonth() + 1) + '.' : ''), true); return; }
                     h += row(slot, `${cfg.label} ${dir === 'up' ? '⬆️ erhöhen' : '⬇️ senken'}`, paramColors[k], prodSummary(slot, p), !!(p.name && p.effect > 0));
                 });
             });
@@ -4787,7 +4798,7 @@
         }
 
         // ===== Trend-Verlaufskurve =====
-        const paramColors = { aio: '#35e8c0', sal: '#27c8ff', kh: '#2bf08a', ca: '#e4ff3a', mg: '#a56bff', no3: '#ff9a2e', po4: '#ff3b5c', no3_down: '#ffc266', po4_down: '#ff6f8a', temp: '#eef3f8', ph: '#ff4fc8' };
+        const paramColors = { aio: '#35e8c0', sal: '#27c8ff', kh: '#2bf08a', ca: '#e4ff3a', mg: '#a56bff', no3: '#ff9a2e', po4: '#ff3b5c', no3_down: '#ffc266', sal_down: '#7fe0ff', po4_down: '#ff6f8a', temp: '#eef3f8', ph: '#ff4fc8' };
         const DAY_MS = 86400000;
         let chartPrefs = loadChartPrefs();
         let chartWindow = { start: 0, end: 1, days: 7, ticks: [] };
