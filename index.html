@@ -1081,6 +1081,8 @@
         .gt-res { padding: 6px 10px; margin-bottom: 8px; border-radius: 12px; font-size: 0.8rem; }
         .gt-res .btn-note { padding: 6px 12px; font-size: 0.8rem; }
         .step .stepper > button { width: 44px; font-size: 1.4rem; border-radius: 12px; } .step .stepper { gap: 8px; } .step .st-mid input { font-size: 1.3rem; } .step .st-mid { padding-top: 0; padding-bottom: 0; } .step .btn-note.big { padding: 11px; font-size: 1rem; margin-top: 8px; }
+        .gt-row { grid-template-columns: 1.15fr 1fr 1fr; } .gt-v input { width: 100%; flex: 1 1 auto; }
+        .gt-l em { font-style: normal; text-transform: none; letter-spacing: 0; opacity: .8; }
 </style>
 </head>
 <body>
@@ -3946,8 +3948,8 @@
             const tgt = e.target !== undefined ? e.target : (e.minOpt + e.maxOpt) / 2;
             const when = lv && lv.date ? String(lv.date).split('-').reverse().slice(0, 2).join('.') : '';
             return `<div class="gt-row">${dateT}
-                <label class="gt"><span class="gt-l">Ist</span><span class="gt-v"><input type="number" step="any" inputmode="decimal" id="cc_${slot}" value="${lv ? r3(lv.v) : ''}" placeholder="–" aria-label="Ist-Wert" oninput="calcShow('${slot}')"><i>${cfg.unit}</i></span></label>
-                <label class="gt"><span class="gt-l">Ziel</span><span class="gt-v"><input type="number" step="any" inputmode="decimal" id="ct_${slot}" value="${r3(tgt)}" placeholder="–" aria-label="Zielwert" oninput="calcShow('${slot}')"><i>${cfg.unit}</i></span></label></div>
+                <label class="gt"><span class="gt-l">Ist <em>${cfg.unit}</em></span><span class="gt-v"><input type="number" step="any" inputmode="decimal" id="cc_${slot}" value="${lv ? r3(lv.v) : ''}" placeholder="–" aria-label="Ist-Wert" oninput="calcShow('${slot}')"></span></label>
+                <label class="gt"><span class="gt-l">Ziel <em>${cfg.unit}</em></span><span class="gt-v"><input type="number" step="any" inputmode="decimal" id="ct_${slot}" value="${r3(tgt)}" placeholder="–" aria-label="Zielwert" oninput="calcShow('${slot}')"></span></label></div>
                 <div class="gt-res"><div class="calc-res" id="cr_${slot}"></div><button type="button" class="btn-note save" onclick="calcApply('${slot}')">↓ Übernehmen</button></div>`;
         }
         function doseBlockHtml(slot, p) {
