@@ -983,6 +983,55 @@
             .app-toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom)); transform: translate(-50%, 20px); max-width: min(92vw, 420px); padding: 12px 18px; border-radius: 14px; background: rgba(20, 40, 36, 0.96); border: 1px solid #62d6bb; color: #f0f4f8; font-size: 0.95rem; font-weight: 600; text-align: center; box-shadow: 0 8px 30px rgba(0,0,0,0.5); opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 9999; }
         .app-toast.show { opacity: 1; transform: translate(-50%, 0); }
         .app-toast.warn { background: rgba(48, 22, 28, 0.96); border-color: #ff6b81; }
+
+        /* ===== Neon-Design (türkis) einheitlich ===== */
+        :root { --neon: #5cc9de; --neon-g: rgba(92, 201, 222, 0.28); }
+        .glass-panel { border-color: rgba(92, 201, 222, 0.2) !important; box-shadow: 0 0 28px rgba(92, 201, 222, 0.06), inset 0 0 0 1px rgba(92, 201, 222, 0.03) !important; }
+        .btn-submit, .btn-note, .btn-note.save, .more-close, .pb-mini > summary { }
+        .btn-submit, .btn-note, .btn-note.save { background: linear-gradient(180deg, rgba(92, 201, 222, 0.22), rgba(92, 201, 222, 0.07)) !important; color: #effbff !important; border: 1px solid rgba(92, 201, 222, 0.7) !important; border-radius: 14px !important; font-weight: 600 !important; letter-spacing: 0.2px; box-shadow: 0 0 18px rgba(92, 201, 222, 0.22), inset 0 0 14px rgba(92, 201, 222, 0.08) !important; text-shadow: 0 0 10px rgba(92, 201, 222, 0.55); transition: transform .12s, box-shadow .2s; }
+        .btn-submit:active, .btn-note:active { transform: scale(0.97); box-shadow: 0 0 26px rgba(92, 201, 222, 0.4), inset 0 0 18px rgba(92, 201, 222, 0.16) !important; }
+        .input-styled:focus, .stepper input:focus { outline: none; border-color: var(--neon) !important; box-shadow: 0 0 0 3px rgba(92, 201, 222, 0.18), 0 0 14px rgba(92, 201, 222, 0.2) !important; }
+        .type-toggle.active, .seg button.active, .range-btn.active, .dose-range-btn.active { background: linear-gradient(180deg, rgba(92, 201, 222, 0.24), rgba(92, 201, 222, 0.08)) !important; color: #fff !important; box-shadow: inset 0 0 0 1px rgba(92, 201, 222, 0.6), 0 0 14px rgba(92, 201, 222, 0.2) !important; }
+        .nav-item.active { box-shadow: inset 0 0 0 1px rgba(92, 201, 222, 0.35), 0 0 16px rgba(92, 201, 222, 0.15); }
+        .step, .calc-det, .prow, .tile { border-color: rgba(92, 201, 222, 0.16); }
+        .prow { background: linear-gradient(180deg, rgba(92, 201, 222, 0.05), rgba(255, 255, 255, 0.02)); }
+        .prow:active, .tile:active { box-shadow: 0 0 18px rgba(92, 201, 222, 0.25); }
+        .btn-note.full { width: 100%; padding: 10px; margin-top: 10px; } .btn-note.big { padding: 13px; font-size: 1rem; margin-top: 12px; }
+        .dl { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); margin: 12px 0 6px; }
+        .step-h { font-size: 0.74rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--neon); margin-bottom: 10px; text-shadow: 0 0 10px rgba(92, 201, 222, 0.4); }
+        .stepper { display: flex; align-items: stretch; gap: 10px; }
+        .stepper > button { width: 52px; flex: none; border-radius: 14px; border: 1px solid rgba(92, 201, 222, 0.55); background: rgba(92, 201, 222, 0.1); color: #effbff; font-size: 1.7rem; font-family: inherit; line-height: 1; cursor: pointer; box-shadow: 0 0 12px rgba(92, 201, 222, 0.15); }
+        .stepper > button:active { background: rgba(92, 201, 222, 0.25); }
+        .st-mid { flex: 1; min-width: 0; display: flex; align-items: baseline; justify-content: center; gap: 6px; border-radius: 14px; background: rgba(0, 0, 0, 0.35); border: 1px solid rgba(255, 255, 255, 0.08); padding: 6px 8px; }
+        .st-mid input { width: 4.2em; min-width: 0; border: 0; background: none; color: #fff; font-family: inherit; font-size: 1.7rem; font-weight: 700; text-align: right; -moz-appearance: textfield; }
+        .st-mid input::-webkit-outer-spin-button, .st-mid input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .st-mid span { color: var(--text-muted); font-size: 0.9rem; }
+        .step .seg-s { margin-bottom: 4px; }
+        .step input[type=date] { width: 100%; }
+        .calc-det > summary { color: #effbff; }
+        /* Seitenleiste */
+        .page-bar { position: sticky; top: 0; z-index: 40; display: flex; align-items: center; gap: 12px; margin: 0 0 12px; padding: 10px 2px; background: linear-gradient(180deg, rgba(1, 3, 5, 0.96), rgba(1, 3, 5, 0.75)); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(92, 201, 222, 0.16); }
+        .pb-back { border: 1px solid rgba(92, 201, 222, 0.55); background: rgba(92, 201, 222, 0.1); color: #effbff; border-radius: 12px; padding: 7px 12px; font-family: inherit; font-weight: 600; font-size: 0.85rem; cursor: pointer; box-shadow: 0 0 12px rgba(92, 201, 222, 0.15); }
+        .pb-title { font-weight: 700; font-size: 1.02rem; }
+        /* Gesundheit-Erklärung */
+        .hsheet { display: none; position: fixed; inset: 0; z-index: 900; background: rgba(1, 3, 6, 0.7); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); align-items: flex-end; justify-content: center; }
+        .hsheet.open { display: flex; }
+        .hs-card { width: 100%; max-width: 560px; max-height: 88vh; overflow-y: auto; padding: 16px 18px calc(22px + env(safe-area-inset-bottom, 0px)); border-radius: 24px 24px 0 0; background: linear-gradient(180deg, #0b1822, #060d14); border: 1px solid rgba(92, 201, 222, 0.3); box-shadow: 0 -10px 50px rgba(92, 201, 222, 0.12); }
+        .hs-top { display: flex; justify-content: space-between; align-items: center; font-size: 1.1rem; margin-bottom: 12px; }
+        .hs-x { border: 1px solid rgba(92, 201, 222, 0.4); background: rgba(92, 201, 222, 0.08); color: #fff; width: 34px; height: 34px; border-radius: 50%; font-size: 0.95rem; cursor: pointer; }
+        .hs-hero { display: flex; align-items: center; gap: 16px; margin-bottom: 6px; }
+        .hs-verdict { font-size: 1.25rem; font-weight: 700; margin-bottom: 4px; }
+        .hs-h { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--neon); margin: 18px 0 8px; }
+        .hs-scale { position: relative; height: 10px; border-radius: 6px; background: linear-gradient(90deg, #ef6b7a 0 59%, #e6c677 59% 84%, #4fd6a4 84% 100%); opacity: .85; }
+        .hs-scale i { position: absolute; top: -5px; width: 4px; height: 20px; margin-left: -2px; border-radius: 2px; background: #fff; box-shadow: 0 0 10px #fff; }
+        .hs-legend { display: flex; justify-content: space-between; margin-top: 8px; font-size: 0.7rem; line-height: 1.35; text-align: center; }
+        .hs-legend span:first-child { text-align: left; } .hs-legend span:last-child { text-align: right; }
+        .hs-row { display: grid; grid-template-columns: 5.6em 1fr 1.4fr 4.4em; gap: 8px; align-items: center; padding: 6px 0; font-size: 0.8rem; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+        .hs-n { color: var(--text-muted); } .hs-v { font-weight: 600; white-space: nowrap; font-size: 0.78rem; } .hs-p { text-align: right; font-size: 0.72rem; font-weight: 600; }
+        .hs-bar { height: 6px; border-radius: 4px; background: rgba(255, 255, 255, 0.07); overflow: hidden; } .hs-bar i { display: block; height: 100%; border-radius: 4px; }
+        .hs-chart { width: 100%; height: 100px; display: block; border-radius: 10px; }
+        .hs-axis { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-muted); margin-top: 2px; }
+        .sub-back { display: none !important; }
     </style>
 </head>
 <body>
@@ -1022,6 +1071,7 @@
     <div class="tm-toast" id="tmToast" onclick="tmDismissAll()">⏰ Countdown abgelaufen – tippen zum Beenden</div>
 
     <div class="container">
+        <div class="page-bar" id="pageBar" style="display:none"><button type="button" class="pb-back" onclick="pageBack()">‹ Übersicht</button><span class="pb-title" id="pageBarTitle"></span></div>
 
         <!-- DASHBOARD TAB -->
         <div id="dashboard" class="tab-content active">
@@ -1352,7 +1402,15 @@
             if (t === 'dashboard' && curSub === 'rec') a = 'rec';
             else if ((t === 'dashboard' && curSub) || t === 'targets') a = 'more';
             document.querySelectorAll('.nav-item').forEach(b => b.classList.toggle('active', b.dataset.tab === a));
+            const bar = document.getElementById('pageBar');
+            if (bar) {
+                const T = { rec: 'Tipps & Empfehlungen', hist: 'Historie', rem: 'Erinnerungen', bak: 'Backup' };
+                const title = (t === 'dashboard' && curSub) ? T[curSub] : (t === 'targets' ? 'Sollwerte' : '');
+                bar.style.display = title ? 'flex' : 'none';
+                document.getElementById('pageBarTitle').textContent = title || '';
+            }
         }
+        function pageBack() { if (curSub) { showSub(curSub); } else { navGo('dashboard'); } }
         function navGo(x) {
             closeMore();
             if (x === 'rec') { switchTab('dashboard'); showSub('rec'); return; }
@@ -1386,11 +1444,60 @@
             });
             return { n, score: n ? Math.round(pts / n * 100) : null, opt, warn, crit, none, last };
         }
+
+        // ===== Beckengesundheit: Erklärung, Skala, Verlauf =====
+        function healthAt(ts) {
+            let n = 0, pts = 0;
+            Object.keys(thresholds).forEach(k => {
+                let best = null;
+                records.forEach(r => { if (r.values && r.values[k] !== null && r.values[k] !== undefined && r.values[k] !== '') { const t = recTs(r), v = parseFloat(r.values[k]); if (!isNaN(v) && t <= ts && (!best || t > best.t)) best = { t, v }; } });
+                if (!best) return; n++;
+                const l = getStatusColorClass(k, String(best.v)).label;
+                pts += l === 'Optimal' ? 1 : l === 'Warnung' ? 0.55 : 0;
+            });
+            return n ? Math.round(pts / n * 100) : null;
+        }
+        function openHealth() {
+            const h = healthSummary(); if (h.score === null) { navGo('input'); return; }
+            const col = h.score >= 85 ? '#4fd6a4' : h.score >= 60 ? '#e6c677' : '#ef6b7a';
+            const verdict = h.score >= 85 ? 'Sehr gut' : h.score >= 60 ? 'Aufmerksam bleiben' : 'Handlungsbedarf';
+            const R = 50, C = 2 * Math.PI * R;
+            const rows = Object.keys(thresholds).map(k => {
+                const lv = latestValue(k), cfg = thresholds[k];
+                if (!lv) return `<div class="hs-row"><span class="hs-n">${escapeHtml(cfg.label)}</span><span class="hs-v">–</span><span class="hs-bar"><i style="width:0"></i></span><span class="hs-p">kein Wert</span></div>`;
+                const l = getStatusColorClass(k, String(lv.v)).label, p = l === 'Optimal' ? 100 : l === 'Warnung' ? 55 : 0, c = l === 'Optimal' ? '#4fd6a4' : l === 'Warnung' ? '#e6c677' : '#ef6b7a';
+                return `<div class="hs-row"><span class="hs-n">${escapeHtml(cfg.label)}</span><span class="hs-v">${lv.v} ${escapeHtml(cfg.unit || '')}</span><span class="hs-bar"><i style="width:${Math.max(p, 4)}%;background:${c}"></i></span><span class="hs-p" style="color:${c}">${l}</span></div>`;
+            }).join('');
+            const tss = [...new Set(records.map(recTs).filter(t => !isNaN(t)))].sort((a, b) => a - b).slice(-12);
+            const hist = tss.map(t => ({ t, s: healthAt(t) })).filter(x => x.s !== null);
+            let chart = '<div class="rec-meta">Der Verlauf erscheint ab der zweiten Messung.</div>';
+            if (hist.length > 1) {
+                const W = 320, H = 90, px = 10, py = 10, xy = (x, i) => [px + (W - 2 * px) * i / (hist.length - 1), py + (H - 2 * py) * (1 - x.s / 100)];
+                const c = hist.map(xy);
+                const band = (a, b, f) => `<rect x="0" y="${py + (H - 2 * py) * (1 - b / 100)}" width="${W}" height="${(H - 2 * py) * (b - a) / 100}" fill="${f}"/>`;
+                chart = `<svg viewBox="0 0 ${W} ${H}" class="hs-chart" role="img" aria-label="Verlauf der Beckengesundheit">${band(0, 60, 'rgba(239,107,122,.08)')}${band(60, 85, 'rgba(230,198,119,.08)')}${band(85, 100, 'rgba(79,214,164,.09)')}<polyline points="${c.map(a => a[0].toFixed(1) + ',' + a[1].toFixed(1)).join(' ')}" fill="none" stroke="#5cc9de" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>${c.map((a, i) => `<circle cx="${a[0].toFixed(1)}" cy="${a[1].toFixed(1)}" r="${i === c.length - 1 ? 4 : 2.4}" fill="#5cc9de"/>`).join('')}</svg><div class="hs-axis"><span>${new Date(hist[0].t).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })}</span><span>${new Date(hist[hist.length - 1].t).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })}</span></div>`;
+            }
+            let sh = document.getElementById('healthSheet');
+            if (!sh) { sh = document.createElement('div'); sh.id = 'healthSheet'; sh.className = 'hsheet'; sh.onclick = e => { if (e.target === sh) closeHealth(); }; document.body.appendChild(sh); }
+            sh.innerHTML = `<div class="hs-card" role="dialog" aria-label="Beckengesundheit"><div class="hs-top"><b>Beckengesundheit</b><button type="button" class="hs-x" onclick="closeHealth()" aria-label="Schließen">✕</button></div>
+                <div class="hs-hero"><div class="health-ring" style="--hc:${col};width:120px;height:120px"><svg viewBox="0 0 120 120"><circle class="trk" cx="60" cy="60" r="${R}"/><circle class="arc" cx="60" cy="60" r="${R}" stroke-dasharray="${(C * h.score / 100).toFixed(1)} ${C.toFixed(1)}"/></svg><div class="health-num"><b>${h.score}</b><small>von 100</small></div></div>
+                <div><div class="hs-verdict" style="color:${col}">${verdict}</div><div class="rec-meta">${h.opt} optimal${h.warn ? ' · ' + h.warn + ' Warnung' + (h.warn > 1 ? 'en' : '') : ''}${h.crit ? ' · ' + h.crit + ' kritisch' : ''}${h.none ? ' · ' + h.none + ' ohne Messung' : ''}</div></div></div>
+                <div class="hs-h">Skala</div>
+                <div class="hs-scale"><i style="left:${h.score}%"></i></div>
+                <div class="hs-legend"><span style="color:#ef6b7a">0–59<br>Handlungsbedarf</span><span style="color:#e6c677">60–84<br>Aufmerksam</span><span style="color:#4fd6a4">85–100<br>Sehr gut</span></div>
+                <div class="hs-h">So entsteht die Zahl</div>
+                <div class="rec-meta">Jeder Wert zählt gleich. Optimal gibt 100 %, Warnung 55 %, Kritisch 0 %. Der Durchschnitt aller gemessenen Werte ergibt die Zahl im Ring.</div>
+                <div class="hs-h">Deine Werte</div>${rows}
+                <div class="hs-h">Verlauf</div>${chart}
+                <button type="button" class="btn-note save full" style="margin-top:14px" onclick="closeHealth();navGo('rec')">Tipps ansehen</button></div>`;
+            sh.classList.add('open'); document.body.style.overflow = 'hidden';
+        }
+        function closeHealth() { const sh = document.getElementById('healthSheet'); if (sh) sh.classList.remove('open'); document.body.style.overflow = ''; }
         function healthRingHtml(h) {
             const R = 50, C = 2 * Math.PI * R;
             if (h.score === null) return `<div class="hub-ring" onclick="navGo('input')" role="button" aria-label="Noch keine Messwerte, Messung eintragen"><div class="health-ring" style="--hc:#5cc9de"><svg viewBox="0 0 120 120"><circle class="trk" cx="60" cy="60" r="${R}"/></svg><div class="health-num"><b>–</b><small>Gesundheit</small></div></div></div>`;
             const col = h.score >= 85 ? '#4fd6a4' : h.score >= 60 ? '#e6c677' : '#ef6b7a';
-            return `<div class="hub-ring" onclick="navGo('rec')" role="button" aria-label="Beckengesundheit ${h.score} von 100, Tipps öffnen"><div class="health-ring" style="--hc:${col}"><svg viewBox="0 0 120 120"><circle class="trk" cx="60" cy="60" r="${R}"/><circle class="arc" id="healthArc" cx="60" cy="60" r="${R}" stroke-dasharray="0 ${C.toFixed(1)}" data-len="${(C * h.score / 100).toFixed(1)} ${C.toFixed(1)}"/></svg><div class="health-num"><b>${h.score}</b><small>Gesundheit</small></div></div></div>`;
+            return `<div class="hub-ring" onclick="openHealth()" role="button" aria-label="Beckengesundheit ${h.score} von 100, Erklärung öffnen"><div class="health-ring" style="--hc:${col}"><svg viewBox="0 0 120 120"><circle class="trk" cx="60" cy="60" r="${R}"/><circle class="arc" id="healthArc" cx="60" cy="60" r="${R}" stroke-dasharray="0 ${C.toFixed(1)}" data-len="${(C * h.score / 100).toFixed(1)} ${C.toFixed(1)}"/></svg><div class="health-num"><b>${h.score}</b><small>Gesundheit</small></div></div></div>`;
         }
         function renderHealth() {
             const box = document.getElementById('healthCard'); if (!box) return;
@@ -1398,13 +1505,7 @@
                 box.innerHTML = `<div class="welcome"><div class="w-t">Willkommen bei PeRo Log</div><div class="w-s">Dein Riff-Logbuch in drei Schritten:</div><ol><li><b>Messen</b> – trage deine erste Messung ein.</li><li><b>Dosieren</b> – richte deine Produkte und Dosierung ein (optional).</li><li><b>Tipps</b> – lies die Hinweise zu deinen Werten.</li></ol><button type="button" class="btn-submit" style="margin-top:12px;" onclick="navGo('input')">Erste Messung eintragen</button></div>`;
                 return;
             }
-            const h = healthSummary();
-            if (h.score === null) { box.innerHTML = ''; return; }
-            const title = h.crit ? (h.crit === 1 ? 'Ein Wert ist kritisch' : h.crit + ' Werte sind kritisch') : h.warn ? (h.score >= 85 ? 'Fast perfekt' : 'Einzelne Werte beachten') : 'Alle Werte im Soll';
-            const parts = [];
-            if (h.opt) parts.push(h.opt + ' optimal'); if (h.warn) parts.push(h.warn + (h.warn === 1 ? ' Warnung' : ' Warnungen')); if (h.crit) parts.push(h.crit + ' kritisch'); if (h.none) parts.push(h.none + ' ohne Messung');
-            const ld = h.last ? new Date(h.last) : null;
-            box.innerHTML = `<div class="hub-cap" onclick="navGo('rec')" role="button"><div><div class="cap-t">${title}</div><div class="cap-s">${parts.join(' · ')}${ld ? ' · Letzte Messung ' + pad2(ld.getDate()) + '.' + pad2(ld.getMonth() + 1) + '.' : ''}</div></div><span class="cap-link">Tipps ›</span></div><div class="hub-help">Tippe auf einen Wert für Verlauf und Details. Die Zahl im Ring (0 bis 100) zeigt, wie viele Werte im Soll liegen.</div>`;
+            box.innerHTML = '';
         }
 
         function switchTab(tabId) {
@@ -3626,14 +3727,23 @@
             renderDoseChart();
         }
 
+        function stepVal(id, dir, step) {
+            const el = document.getElementById(id); if (!el) return;
+            const cur = parseFloat(String(el.value).replace(',', '.')) || 0;
+            el.value = String(Math.max(0, Math.round((cur + dir * step) * 100) / 100)); el.focus({ preventScroll: true });
+        }
+        function stepperHtml(id, p, ph, val, onEnter) {
+            const u = escapeHtml(p.unit || 'ml'), st = (p.unit === 'Tropfen' || p.unit === 'Tabletten') ? 1 : 0.5;
+            return `<div class="stepper"><button type="button" onclick="stepVal('${id}',-1,${st})" aria-label="weniger">−</button><div class="st-mid"><input type="number" step="any" inputmode="decimal" id="${id}" placeholder="0" aria-label="${ph}" value="${val}" ${onEnter ? `onkeydown="if(event.key==='Enter'){event.preventDefault();${onEnter}}"` : ''}><span>${u}</span></div><button type="button" onclick="stepVal('${id}',1,${st})" aria-label="mehr">+</button></div>`;
+        }
         function doseBlockHtml(slot, p) {
             const u = escapeHtml(p.unit || 'ml'), once = p.mode === 'once';
             const seg = `<div class="seg seg-s" role="group" aria-label="Dosierart"><button type="button" class="${once ? '' : 'active'}" onclick="setProduct('${slot}','mode','')">Täglich</button><button type="button" class="${once ? 'active' : ''}" onclick="setProduct('${slot}','mode','once')">Einzelne Gaben</button></div>`;
             if (once) {
                 const list = dosingLog.map((e, i) => ({ e, i })).filter(x => x.e.kind === 'once' && x.e.slot === slot).sort((a, b) => b.e.ts - a.e.ts).slice(0, 3).map(({ e, i }) => { const d = new Date(e.ts); return `<div class="gabe"><span>${pad2(d.getDate())}.${pad2(d.getMonth() + 1)}.${d.getFullYear()} · ${fmtNum(e.v)} ${u}</span><button type="button" class="thr-link" onclick="deleteGabe(${i})">löschen</button></div>`; }).join('');
-                return seg + `<div class="dose-row wrap"><input type="date" id="gd_${slot}" class="input-styled" value="${isoToday()}" aria-label="Datum"><input type="number" step="any" inputmode="decimal" id="ga_${slot}" class="input-styled" placeholder="Menge" aria-label="Menge"><span class="du">${u}</span><button type="button" class="btn-note save" onclick="addGabe('${slot}')">Eintragen</button></div>${list ? '<div class="pb-lab">Letzte Gaben</div>' + list : ''}`;
+                return seg + `<div class="dl">Datum</div><input type="date" id="gd_${slot}" class="input-styled" value="${isoToday()}" aria-label="Datum"><div class="dl">Menge der Gabe</div>${stepperHtml('ga_' + slot, p, 'Menge', '', `addGabe('${slot}')`)}<button type="button" class="btn-note save full big" onclick="addGabe('${slot}')">Gabe eintragen</button>${list ? '<div class="dl">Letzte Gaben</div>' + list : ''}`;
             }
-            return seg + `<div class="dose-row"><input type="number" step="any" inputmode="decimal" id="dd_${slot}" class="input-styled" placeholder="Tagesdosis" aria-label="Tagesdosis" value="${p.daily || ''}" onkeydown="if(event.key==='Enter'){event.preventDefault();saveDaily('${slot}')}"><span class="du">${u} pro Tag</span><button type="button" class="btn-note save" onclick="saveDaily('${slot}')">Speichern</button></div><details class="pb-mini"><summary>Früheren Tag nachtragen</summary><div class="dose-row" style="margin-top:8px;"><input type="date" id="rd_${slot}" class="input-styled" value="${isoToday()}" aria-label="Datum"><input type="number" step="any" inputmode="decimal" id="rv_${slot}" class="input-styled" placeholder="Menge" aria-label="Menge"><span class="du">${u}</span><button type="button" class="btn-note save" onclick="addDailyFrom('${slot}')">Eintragen</button></div></details>`;
+            return seg + `<div class="dl">Menge pro Tag</div>${stepperHtml('dd_' + slot, p, 'Tagesdosis', p.daily || '', `saveDaily('${slot}')`)}<button type="button" class="btn-note save full big" onclick="saveDaily('${slot}')">Tagesdosis speichern</button><details class="pb-mini"><summary>Früheren Tag nachtragen</summary><div class="dose-row wrap" style="margin-top:8px;"><input type="date" id="rd_${slot}" class="input-styled" value="${isoToday()}" aria-label="Datum"><input type="number" step="any" inputmode="decimal" id="rv_${slot}" class="input-styled" placeholder="Menge" aria-label="Menge"><span class="du">${u}</span><button type="button" class="btn-note save" onclick="addDailyFrom('${slot}')">Eintragen</button></div></details>`;
         }
 
         function calcDose(slot, delta) {
@@ -3717,7 +3827,7 @@
             }
             return parts.length ? parts.join(' · ') : 'nicht eingerichtet';
         }
-        let prodEdit = null;
+        let prodEdit = null, calcOpen = false;
         function openProd(slot) { prodEdit = slot; renderProductSettings(); window.scrollTo({ top: 0 }); }
         function closeProd() { prodEdit = null; renderProductSettings(); window.scrollTo({ top: 0 }); }
         function renderProductSettings() {
@@ -3734,18 +3844,18 @@
                     h += `<div class="step"><div class="step-h">Dosierung</div>${doseBlockHtml(slot, p)}</div>`;
                 } else {
                     const hasD = hasDoseBlock(k, dir), vb = dir === 'up' ? 'erhöht' : 'senkt';
-                    h += `<div class="step"><div class="step-h"><b>1</b>Produkt</div>
-                        <input type="text" class="input-styled" placeholder="Produktname, z. B. Grotech Phosphat Plus" aria-label="Produktname" value="${escapeHtml(p.name || '')}" onchange="setProduct('${slot}','name',this.value)">
-                        <div class="pb-lab">Wirkung laut Etikett: <b>${p.amount || '1'} ${escapeHtml(p.unit || 'ml')}</b> ${vb} ${cfg.label} um <b>${p.effect || '…'} ${cfg.unit}</b> in <b>${p.per || '100'} L</b></div>
+                    h += `<div class="step"><div class="step-h">Produkt</div>
+                        <input type="text" class="input-styled" placeholder="Produktname" aria-label="Produktname" value="${escapeHtml(p.name || '')}" onchange="setProduct('${slot}','name',this.value)">
+                        <div class="dl">Wirkung laut Etikett (${vb} ${cfg.label})</div>
                         <div class="eff-grid">
                             <label>Menge<input type="number" step="any" inputmode="decimal" class="input-styled" placeholder="1" value="${p.amount || ''}" onchange="setProduct('${slot}','amount',this.value)"></label>
                             <label>Einheit<select class="input-styled" onchange="setProduct('${slot}','unit',this.value)">${units.map(u => `<option${(p.unit || 'ml') === u ? ' selected' : ''}>${u}</option>`).join('')}</select></label>
-                            <label>${cfg.unit || 'Wirkung'}<input type="number" step="any" inputmode="decimal" class="input-styled" placeholder="${cfg.unit === 'psu' ? '1' : '0,1'}" value="${p.effect || ''}" onchange="setProduct('${slot}','effect',this.value)"></label>
+                            <label>um ${cfg.unit || 'Wirkung'}<input type="number" step="any" inputmode="decimal" class="input-styled" placeholder="${cfg.unit === 'psu' ? '1' : '0,1'}" value="${p.effect || ''}" onchange="setProduct('${slot}','effect',this.value)"></label>
                             <label>in Litern<input type="number" step="any" inputmode="decimal" class="input-styled" placeholder="100" value="${p.per || ''}" onchange="setProduct('${slot}','per',this.value)"></label>
                         </div>
                         <button type="button" class="btn-note save full" onclick="if(document.activeElement)document.activeElement.blur();showToast('Produkt gespeichert ✓')">Produkt speichern</button></div>`;
-                    if (hasD) h += `<div class="step"><div class="step-h"><b>2</b>Dosierung</div>${doseBlockHtml(slot, p)}</div>`;
-                    h += `<details class="calc-det"><summary>Menge berechnen</summary>${calcHtml(slot, k, dir, p)}</details>`;
+                    if (hasD) h += `<div class="step"><div class="step-h">Dosierung</div>${doseBlockHtml(slot, p)}</div>`;
+                    h += `<details class="calc-det"${calcOpen ? ' open' : ''} ontoggle="calcOpen=this.open"><summary>Menge berechnen</summary>${calcHtml(slot, k, dir, p)}</details>`;
                 }
                 root.innerHTML = h;
                 root.querySelectorAll('[id^="cr_"]').forEach(el => calcShow(el.id.slice(3)));
