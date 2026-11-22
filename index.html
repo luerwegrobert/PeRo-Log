@@ -1024,8 +1024,9 @@
         .hs-h { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--neon); margin: 18px 0 8px; }
         .hs-scale { position: relative; height: 10px; border-radius: 6px; background: linear-gradient(90deg, #ef6b7a 0 59%, #e6c677 59% 84%, #4fd6a4 84% 100%); opacity: .85; }
         .hs-scale i { position: absolute; top: -5px; width: 4px; height: 20px; margin-left: -2px; border-radius: 2px; background: #fff; box-shadow: 0 0 10px #fff; }
-        .hs-legend { display: flex; justify-content: space-between; margin-top: 8px; font-size: 0.7rem; line-height: 1.35; text-align: center; }
-        .hs-legend span:first-child { text-align: left; } .hs-legend span:last-child { text-align: right; }
+        .hs-text { line-height: 1.5; }
+        .hs-legend { display: flex; justify-content: space-between; margin-top: 8px; font-size: 0.62rem; line-height: 1.35; text-align: center; }
+        .hs-legend span { flex: 1; } .hs-legend span:first-child { text-align: left; } .hs-legend span:last-child { text-align: right; }
         .hs-row { display: grid; grid-template-columns: 5.6em 1fr 1.4fr 4.4em; gap: 8px; align-items: center; padding: 6px 0; font-size: 0.8rem; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
         .hs-n { color: var(--text-muted); } .hs-v { font-weight: 600; white-space: nowrap; font-size: 0.78rem; } .hs-p { text-align: right; font-size: 0.72rem; font-weight: 600; }
         .hs-bar { height: 6px; border-radius: 4px; background: rgba(255, 255, 255, 0.07); overflow: hidden; } .hs-bar i { display: block; height: 100%; border-radius: 4px; }
@@ -1417,9 +1418,14 @@
             }
         }
         function pageBack() { if (curSub) { showSub(curSub); } else { navGo('dashboard'); } }
+        function resetViews() {
+            closeMore(); try { closeHealth(); } catch (e) {}
+            collapseAll(); calcOpen = false;
+            if (prodEdit) { prodEdit = null; renderProductSettings(); }
+        }
         function navGo(x) {
-            closeMore();
-            if (x === 'rec') { switchTab('dashboard'); showSub('rec'); return; }
+            resetViews();
+            if (x === 'rec') { switchTab('dashboard'); if (curSub !== 'rec') showSub('rec'); window.scrollTo({ top: 0 }); return; }
             const same = document.querySelector('.tab-content.active') && document.querySelector('.tab-content.active').id === x && !curSub;
             switchTab(x);
             if (same) window.scrollTo({ top: 0, behavior: 'smooth' }); else window.scrollTo({ top: 0 });
@@ -1427,10 +1433,10 @@
         function openMore() { document.getElementById('moreSheet').classList.add('open'); }
         function closeMore() { const m = document.getElementById('moreSheet'); if (m) m.classList.remove('open'); }
         function moreGo(name) {
-            closeMore();
+            resetViews();
             if (name === 'targets') { switchTab('targets'); window.scrollTo({ top: 0 }); }
             else if (name === 'pdf') createReport();
-            else { switchTab('dashboard'); showSub(name); }
+            else { switchTab('dashboard'); if (curSub !== name) showSub(name); }
         }
         let doseSeg = 'chart';
         function applyDoseSeg() {
@@ -1440,59 +1446,97 @@
         }
         function setDoseSeg(n) { doseSeg = n; applyDoseSeg(); if (n === 'chart') renderDoseChart(); else renderProductSettings(); window.scrollTo({ top: 0 }); }
         // Beckengesundheit: Gesamtwert aus den neuesten Messwerten (optimal = 100 %, Warnung = 55 %, kritisch = 0 %)
-        function healthSummary() {
-            let n = 0, pts = 0, opt = 0, warn = 0, crit = 0, none = 0, last = 0;
-            Object.keys(thresholds).forEach(k => {
-                const lv = latestValue(k); if (!lv) { none++; return; }
-                n++; const st = getStatusColorClass(k, String(lv.v));
-                if (st.label === 'Optimal') { pts += 1; opt++; } else if (st.label === 'Warnung') { pts += 0.55; warn++; } else { crit++; }
-                if (lv.ts > last) last = lv.ts;
-            });
-            return { n, score: n ? Math.round(pts / n * 100) : null, opt, warn, crit, none, last };
+        // ===== Bewertung: stufenlos, mit Gewichtung und Obergrenzen =====
+        const HW = { sal: 1.2, kh: 1.5, ca: 1, mg: 1, no3: 0.8, po4: 0.8, temp: 1.2, ph: 1.2 };
+        const HLEVELS = [
+            { min: 90, label: 'Ausgezeichnet', color: '#4fd6a4' },
+            { min: 75, label: 'Gut', color: '#a6dc8c' },
+            { min: 55, label: 'Aufmerksam', color: '#e6c677' },
+            { min: 35, label: 'Handlungsbedarf', color: '#f0955e' },
+            { min: 0, label: 'Notfall', color: '#ef6b7a' }
+        ];
+        function healthMeta(score) { return HLEVELS.find(l => score >= l.min); }
+        // Feste Notfall-Grenzen nach gängigen Riffaquaristik-Richtwerten (lo/hi: darunter bzw. darüber = akut)
+        const ACUTE = {
+            sal: { lo: 32.5, hi: 38.5 }, kh: { lo: 6.0, hi: 11 }, ca: { lo: 370, hi: 490 }, mg: { lo: 1100, hi: 1650 },
+            no3: { lo: null, hi: 60 }, po4: { lo: null, hi: 0.3 }, temp: { lo: 22.6, hi: 29 }, ph: { lo: 7.5, hi: 8.7 }
+        };
+        // lvl: 0 optimal, 1 Warnung (innerhalb Toleranz), 2 Kritisch, 3 Akut. s: 1 (optimal) bis 0
+        function valScore(k, v) {
+            const c = thresholds[k], x = parseFloat(v), A = ACUTE[k] || {};
+            let low;
+            if (x >= c.minOpt && x <= c.maxOpt) return { s: 1, lvl: 0 };
+            low = x < c.minOpt;
+            const optEdge = low ? c.minOpt : c.maxOpt, tolEdge = low ? c.minTol : c.maxTol;
+            const tolW = Math.abs(optEdge - tolEdge) || 1e-6, dist = Math.abs(x - optEdge);
+            if (dist <= tolW && (low ? x >= c.minTol : x <= c.maxTol)) return { s: 1 - 0.4 * dist / tolW, lvl: 1 };
+            let bound = low ? A.lo : A.hi;
+            if (bound !== null && bound !== undefined) bound = low ? Math.min(bound, tolEdge - tolW * 0.5) : Math.max(bound, tolEdge + tolW * 0.5);
+            const hasB = bound !== null && bound !== undefined;
+            const span = hasB ? Math.abs(tolEdge - bound) : tolW * 2;
+            const beyondTol = Math.abs(x - tolEdge);
+            const pastBound = hasB && (low ? x < bound : x > bound);
+            if (pastBound) { const ex = Math.abs(x - bound) / span; return { s: Math.max(0, 0.2 - 0.2 * Math.min(1, ex)), lvl: 3 }; }
+            return { s: 0.6 - 0.4 * Math.min(1, beyondTol / span), lvl: 2 };
         }
-
-        // ===== Beckengesundheit: Erklärung, Skala, Verlauf =====
-        function healthAt(ts) {
-            let n = 0, pts = 0;
+        function lvlLabel(l) { return ['Optimal', 'Warnung', 'Kritisch', 'Akut'][l]; }
+        function lvlColor(l) { return ['#4fd6a4', '#e6c677', '#ef6b7a', '#ef6b7a'][l]; }
+        function scoreOf(get) {
+            let n = 0, sw = 0, w = 0, opt = 0, warn = 0, crit = 0, acute = 0, vital = 0, none = 0;
             Object.keys(thresholds).forEach(k => {
+                const v = get(k); if (v === null || v === undefined) { none++; return; }
+                const r = valScore(k, v); n++; w += HW[k]; sw += HW[k] * r.s;
+                if (r.lvl === 0) opt++; else if (r.lvl === 1) warn++; else if (r.lvl === 2) crit++; else { acute++; if (!['no3', 'po4'].includes(k)) vital++; }
+            });
+            if (!n) return { n: 0, score: null, opt, warn, crit, acute, none };
+            let score = Math.round(sw / w * 100);
+            if (vital >= 2 || acute >= 3) score = Math.min(score, 20); else if (vital === 1) score = Math.min(score, 34); else if (acute >= 2) score = Math.min(score, 40); else if (acute === 1) score = Math.min(score, 49); else if (crit >= 2) score = Math.min(score, 60); else if (crit === 1) score = Math.min(score, 74);
+            return { n, score, opt, warn, crit, acute, none };
+        }
+        function healthSummary() {
+            let last = 0;
+            Object.keys(thresholds).forEach(k => { const lv = latestValue(k); if (lv && lv.ts > last) last = lv.ts; });
+            const r = scoreOf(k => { const lv = latestValue(k); return lv ? lv.v : null; });
+            r.last = last; return r;
+        }
+        function healthAt(ts) {
+            return scoreOf(k => {
                 let best = null;
                 records.forEach(r => { if (r.values && r.values[k] !== null && r.values[k] !== undefined && r.values[k] !== '') { const t = recTs(r), v = parseFloat(r.values[k]); if (!isNaN(v) && t <= ts && (!best || t > best.t)) best = { t, v }; } });
-                if (!best) return; n++;
-                const l = getStatusColorClass(k, String(best.v)).label;
-                pts += l === 'Optimal' ? 1 : l === 'Warnung' ? 0.55 : 0;
-            });
-            return n ? Math.round(pts / n * 100) : null;
+                return best ? best.v : null;
+            }).score;
         }
         function openHealth() {
             const h = healthSummary(); if (h.score === null) { navGo('input'); return; }
-            const col = h.score >= 85 ? '#4fd6a4' : h.score >= 60 ? '#e6c677' : '#ef6b7a';
-            const verdict = h.score >= 85 ? 'Sehr gut' : h.score >= 60 ? 'Aufmerksam bleiben' : 'Handlungsbedarf';
-            const R = 50, C = 2 * Math.PI * R;
+            const meta = healthMeta(h.score), col = meta.color, R = 50, C = 2 * Math.PI * R;
             const rows = Object.keys(thresholds).map(k => {
                 const lv = latestValue(k), cfg = thresholds[k];
                 if (!lv) return `<div class="hs-row"><span class="hs-n">${escapeHtml(cfg.label)}</span><span class="hs-v">–</span><span class="hs-bar"><i style="width:0"></i></span><span class="hs-p">kein Wert</span></div>`;
-                const l = getStatusColorClass(k, String(lv.v)).label, p = l === 'Optimal' ? 100 : l === 'Warnung' ? 55 : 0, c = l === 'Optimal' ? '#4fd6a4' : l === 'Warnung' ? '#e6c677' : '#ef6b7a';
-                return `<div class="hs-row"><span class="hs-n">${escapeHtml(cfg.label)}</span><span class="hs-v">${lv.v} ${escapeHtml(cfg.unit || '')}</span><span class="hs-bar"><i style="width:${Math.max(p, 4)}%;background:${c}"></i></span><span class="hs-p" style="color:${c}">${l}</span></div>`;
+                const r = valScore(k, lv.v), c = r.lvl === 0 ? '#4fd6a4' : r.lvl === 1 ? '#e6c677' : '#ef6b7a';
+                return `<div class="hs-row"><span class="hs-n">${escapeHtml(cfg.label)}</span><span class="hs-v">${lv.v} ${escapeHtml(cfg.unit || '')}</span><span class="hs-bar"><i style="width:${Math.max(Math.round(r.s * 100), 4)}%;background:${c}"></i></span><span class="hs-p" style="color:${c}">${lvlLabel(r.lvl)}</span></div>`;
             }).join('');
             const tss = [...new Set(records.map(recTs).filter(t => !isNaN(t)))].sort((a, b) => a - b).slice(-12);
             const hist = tss.map(t => ({ t, s: healthAt(t) })).filter(x => x.s !== null);
             let chart = '<div class="rec-meta">Der Verlauf erscheint ab der zweiten Messung.</div>';
             if (hist.length > 1) {
-                const W = 320, H = 90, px = 10, py = 10, xy = (x, i) => [px + (W - 2 * px) * i / (hist.length - 1), py + (H - 2 * py) * (1 - x.s / 100)];
+                const W = 320, H = 100, px = 10, py = 10, Y = v => py + (H - 2 * py) * (1 - v / 100), xy = (x, i) => [px + (W - 2 * px) * i / (hist.length - 1), Y(x.s)];
                 const c = hist.map(xy);
-                const band = (a, b, f) => `<rect x="0" y="${py + (H - 2 * py) * (1 - b / 100)}" width="${W}" height="${(H - 2 * py) * (b - a) / 100}" fill="${f}"/>`;
-                chart = `<svg viewBox="0 0 ${W} ${H}" class="hs-chart" role="img" aria-label="Verlauf der Beckengesundheit">${band(0, 60, 'rgba(239,107,122,.08)')}${band(60, 85, 'rgba(230,198,119,.08)')}${band(85, 100, 'rgba(79,214,164,.09)')}<polyline points="${c.map(a => a[0].toFixed(1) + ',' + a[1].toFixed(1)).join(' ')}" fill="none" stroke="#5cc9de" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>${c.map((a, i) => `<circle cx="${a[0].toFixed(1)}" cy="${a[1].toFixed(1)}" r="${i === c.length - 1 ? 4 : 2.4}" fill="#5cc9de"/>`).join('')}</svg><div class="hs-axis"><span>${new Date(hist[0].t).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })}</span><span>${new Date(hist[hist.length - 1].t).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })}</span></div>`;
+                const bands = HLEVELS.map((l, i) => { const top = i ? HLEVELS[i - 1].min : 100; return `<rect x="0" y="${Y(top)}" width="${W}" height="${Y(l.min) - Y(top)}" fill="${l.color}" opacity=".08"/>`; }).join('');
+                chart = `<svg viewBox="0 0 ${W} ${H}" class="hs-chart" role="img" aria-label="Verlauf der Beckengesundheit">${bands}<polyline points="${c.map(a => a[0].toFixed(1) + ',' + a[1].toFixed(1)).join(' ')}" fill="none" stroke="#5cc9de" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>${c.map((a, i) => `<circle cx="${a[0].toFixed(1)}" cy="${a[1].toFixed(1)}" r="${i === c.length - 1 ? 4 : 2.4}" fill="#5cc9de"/>`).join('')}</svg><div class="hs-axis"><span>${new Date(hist[0].t).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })}</span><span>${new Date(hist[hist.length - 1].t).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })}</span></div>`;
             }
+            const grad = HLEVELS.slice().reverse().map((l, i, a) => { const from = l.min, to = i < a.length - 1 ? a[i + 1].min : 100; return `${l.color} ${from}% ${to}%`; }).join(', ');
+            const legend = HLEVELS.slice().reverse().map((l, i, a) => `<span style="color:${l.color}"><b>${l.min}${i < a.length - 1 ? '–' + (a[i + 1].min - 1) : '–100'}</b><br>${l.label}</span>`).join('');
+            const parts = [h.opt + ' optimal']; if (h.warn) parts.push(h.warn + ' Warnung' + (h.warn > 1 ? 'en' : '')); if (h.crit) parts.push(h.crit + ' kritisch'); if (h.acute) parts.push(h.acute + ' akut'); if (h.none) parts.push(h.none + ' ohne Messung');
             let sh = document.getElementById('healthSheet');
             if (!sh) { sh = document.createElement('div'); sh.id = 'healthSheet'; sh.className = 'hsheet'; sh.onclick = e => { if (e.target === sh) closeHealth(); }; document.body.appendChild(sh); }
             sh.innerHTML = `<div class="hs-card" role="dialog" aria-label="Beckengesundheit"><div class="hs-top"><b>Beckengesundheit</b><button type="button" class="hs-x" onclick="closeHealth()" aria-label="Schließen">✕</button></div>
                 <div class="hs-hero"><div class="health-ring" style="--hc:${col};width:120px;height:120px"><svg viewBox="0 0 120 120"><circle class="trk" cx="60" cy="60" r="${R}"/><circle class="arc" cx="60" cy="60" r="${R}" stroke-dasharray="${(C * h.score / 100).toFixed(1)} ${C.toFixed(1)}"/></svg><div class="health-num"><b>${h.score}</b><small>von 100</small></div></div>
-                <div><div class="hs-verdict" style="color:${col}">${verdict}</div><div class="rec-meta">${h.opt} optimal${h.warn ? ' · ' + h.warn + ' Warnung' + (h.warn > 1 ? 'en' : '') : ''}${h.crit ? ' · ' + h.crit + ' kritisch' : ''}${h.none ? ' · ' + h.none + ' ohne Messung' : ''}</div></div></div>
+                <div><div class="hs-verdict" style="color:${col}">${meta.label}</div><div class="rec-meta">${parts.join(' · ')}</div></div></div>
                 <div class="hs-h">Skala</div>
-                <div class="hs-scale"><i style="left:${h.score}%"></i></div>
-                <div class="hs-legend"><span style="color:#ef6b7a">0–59<br>Handlungsbedarf</span><span style="color:#e6c677">60–84<br>Aufmerksam</span><span style="color:#4fd6a4">85–100<br>Sehr gut</span></div>
-                <div class="hs-h">So entsteht die Zahl</div>
-                <div class="rec-meta">Jeder Wert zählt gleich. Optimal gibt 100 %, Warnung 55 %, Kritisch 0 %. Der Durchschnitt aller gemessenen Werte ergibt die Zahl im Ring.</div>
+                <div class="hs-scale" style="background:linear-gradient(90deg, ${grad})"><i style="left:${h.score}%"></i></div>
+                <div class="hs-legend">${legend}</div>
+                <div class="hs-h">So wird bewertet</div>
+                <div class="rec-meta hs-text">Jeder Wert bekommt eine Note von 100 % (im Sollbereich) bis 0 %. Je weiter er vom Sollbereich entfernt ist, desto stärker sinkt sie. Wichtige Werte wie KH, Temperatur, Salzgehalt und pH zählen mehr. Liegt ein Wert weit außerhalb, begrenzt das die Gesamtzahl: ein kritischer Wert höchstens 74, ein akuter höchstens 49. Ist ein Hauptwert (Salzgehalt, KH, Calcium, Magnesium, Temperatur oder pH) akut, bleibt es im Notfallbereich (höchstens 34). Die Notfall-Grenzen folgen gängigen Richtwerten, z. B. KH unter 6, Calcium unter 370, Magnesium unter 1100, Salzgehalt unter 32,5 oder über 38,5, Temperatur unter 22,6 oder über 29.</div>
                 <div class="hs-h">Deine Werte</div>${rows}
                 <div class="hs-h">Verlauf</div>${chart}
                 <button type="button" class="btn-note save full" style="margin-top:14px" onclick="closeHealth();navGo('rec')">Tipps ansehen</button></div>`;
@@ -1502,7 +1546,7 @@
         function healthRingHtml(h) {
             const R = 50, C = 2 * Math.PI * R;
             if (h.score === null) return `<div class="hub-ring" onclick="navGo('input')" role="button" aria-label="Noch keine Messwerte, Messung eintragen"><div class="health-ring" style="--hc:#5cc9de"><svg viewBox="0 0 120 120"><circle class="trk" cx="60" cy="60" r="${R}"/></svg><div class="health-num"><b>–</b><small>Gesundheit</small></div></div></div>`;
-            const col = h.score >= 85 ? '#4fd6a4' : h.score >= 60 ? '#e6c677' : '#ef6b7a';
+            const col = healthMeta(h.score).color;
             return `<div class="hub-ring" onclick="openHealth()" role="button" aria-label="Beckengesundheit ${h.score} von 100, Erklärung öffnen"><div class="health-ring" style="--hc:${col}"><svg viewBox="0 0 120 120"><circle class="trk" cx="60" cy="60" r="${R}"/><circle class="arc" id="healthArc" cx="60" cy="60" r="${R}" stroke-dasharray="0 ${C.toFixed(1)}" data-len="${(C * h.score / 100).toFixed(1)} ${C.toFixed(1)}"/></svg><div class="health-num"><b>${h.score}</b><small>Gesundheit</small></div></div></div>`;
         }
         function renderHealth() {
@@ -2080,9 +2124,9 @@
             const keys = Object.keys(thresholds), h = healthSummary(), cells = [];
             keys.forEach(k => {
                 const lv = latestValue(k), cfg = thresholds[k];
-                const st = lv ? getStatusColorClass(k, String(lv.v)) : null;
-                const cls = !st ? 'none' : st.label === 'Optimal' ? 'ok' : st.label === 'Warnung' ? 'warn' : 'crit';
-                const val = lv ? String(lv.v) : '–', stl = st ? st.label : 'Keine Daten';
+                const vs = lv ? valScore(k, lv.v) : null;
+                const cls = !vs ? 'none' : vs.lvl === 0 ? 'ok' : vs.lvl === 1 ? 'warn' : 'crit';
+                const val = lv ? String(lv.v) : '–', stl = vs ? lvlLabel(vs.lvl) : 'Keine Daten';
                 const dt = lv ? pad2(new Date(lv.ts).getDate()) + '.' + pad2(new Date(lv.ts).getMonth() + 1) + '.' : '';
                 cells.push(`<button type="button" class="tile ${cls}" onclick="openDetail('${k}')" aria-label="${escapeHtml(cfg.label)}: ${val} ${escapeHtml(cfg.unit || '')}, ${stl}"><span class="tile-n">${escapeHtml(cfg.label)}</span><span class="tile-v">${val}</span><span class="tile-u">${escapeHtml(cfg.unit || '\u00a0')}${dt ? ' · ' + dt : ''}</span>${sparkHtml(k)}<span class="tile-s"><i></i>${stl}</span></button>`);
             });
