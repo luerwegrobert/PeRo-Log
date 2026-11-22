@@ -1106,6 +1106,9 @@
         .tile-s { display: flex; align-items: center; }
         .tile-d { display: block; margin-top: 3px; font-size: 0.66rem; font-weight: 700; color: #8fd9e8; white-space: nowrap; letter-spacing: 0; text-transform: none; overflow: hidden; text-overflow: ellipsis; }
         .tile-d.flat { color: var(--text-muted); font-weight: 600; }
+        .tile::before { background: var(--pc, var(--sc, #5d6f7d)); box-shadow: 0 0 10px var(--pc, transparent); }
+        .tile .tile-n { color: color-mix(in srgb, var(--pc, #9fb3c0) 70%, #cfe3ea); }
+        .tile { background-image: linear-gradient(100deg, color-mix(in srgb, var(--pc, transparent) 9%, transparent), transparent 55%); }
 </style>
 </head>
 <body>
@@ -2309,7 +2312,7 @@
                 const cls = !vs ? 'none' : vs.lvl === 0 ? 'ok' : vs.lvl === 1 ? 'warn' : 'crit';
                 const val = lv ? String(lv.v) : '–', stl = vs ? lvlLabel(vs.lvl) : 'Keine Daten';
                 const dt = lv ? pad2(new Date(lv.ts).getDate()) + '.' + pad2(new Date(lv.ts).getMonth() + 1) + '.' : '';
-                cells.push(`<button type="button" class="tile ${cls}" onclick="openDetail('${k}')" aria-label="${escapeHtml(cfg.label)}: ${val} ${escapeHtml(cfg.unit || '')}, ${stl}"><span class="tile-n">${escapeHtml(cfg.label)}</span><span class="tile-v">${val}</span><span class="tile-u">${escapeHtml(cfg.unit || '\u00a0')}${dt ? ' · ' + dt : ''}</span>${sparkHtml(k)}<span class="tile-s"><i></i>${stl}</span>${deltaHtml(k, lv)}</button>`);
+                cells.push(`<button type="button" class="tile ${cls}" style="--pc:${paramColors[k] || ''}" onclick="openDetail('${k}')" aria-label="${escapeHtml(cfg.label)}: ${val} ${escapeHtml(cfg.unit || '')}, ${stl}"><span class="tile-n">${escapeHtml(cfg.label)}</span><span class="tile-v">${val}</span><span class="tile-u">${escapeHtml(cfg.unit || '\u00a0')}${dt ? ' · ' + dt : ''}</span>${sparkHtml(k)}<span class="tile-s"><i></i>${stl}</span>${deltaHtml(k, lv)}</button>`);
             });
             cells.splice(Math.min(4, cells.length), 0, healthRingHtml(h));
             grid.innerHTML = cells.join('');
