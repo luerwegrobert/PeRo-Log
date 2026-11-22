@@ -1059,7 +1059,19 @@
         .hub .health-num small.hl { letter-spacing: 0.02em; font-weight: 700; margin-top: 6px; max-width: 78%; text-align: center; line-height: 1.15; }
         .calc-det.in { margin: 10px 0 0; background: rgba(92, 201, 222, 0.04); border-color: rgba(92, 201, 222, 0.2); }
         .step input[type=date], .dose-row input[type=date] { box-sizing: border-box; max-width: 100%; min-width: 0; -webkit-appearance: none; appearance: none; display: block; text-align: left; min-height: 2.6em; }
-    </style>
+    
+        .gt-row { display: grid; grid-template-columns: 1.7fr 1fr 1fr; gap: 8px; margin: 12px 0 8px; }
+        .gt-row.one { grid-template-columns: 1fr; }
+        .gt { display: flex; flex-direction: column; gap: 4px; min-width: 0; padding: 8px 10px; border-radius: 14px; background: rgba(92,201,222,0.05); border: 1px solid rgba(92,201,222,0.2); }
+        .gt-l { font-size: 0.64rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .gt input { width: 100%; min-width: 0; box-sizing: border-box; background: transparent; border: 0; outline: 0; color: #effbff; font-size: 16px; font-weight: 700; padding: 0; -webkit-appearance: none; appearance: none; font-family: inherit; }
+        .gt input[type=date] { min-height: 22px; }
+        .gt-v { display: flex; align-items: baseline; gap: 4px; } .gt-v i { font-style: normal; font-size: 0.7rem; color: var(--text-muted); }
+        .gt-res { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; border-radius: 14px; background: rgba(92,201,222,0.08); border: 1px dashed rgba(92,201,222,0.35); margin-bottom: 4px; font-size: 0.85rem; }
+        .gt-res .calc-res { flex: 1; min-width: 0; }
+        .gt input[type=number]::-webkit-inner-spin-button, .gt input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; } .gt input[type=number] { -moz-appearance: textfield; }
+        .gt input[type=date] { font-size: 15px; }
+</style>
 </head>
 <body>
 
@@ -3915,12 +3927,25 @@
             const u = escapeHtml(p.unit || 'ml'), st = (p.unit === 'Tropfen' || p.unit === 'Tabletten') ? 1 : 0.1;
             return `<div class="stepper"><button type="button" onclick="stepVal('${id}',-1,${st})" aria-label="weniger">−</button><div class="st-mid"><input type="number" step="any" inputmode="decimal" id="${id}" placeholder="0" aria-label="${ph}" value="${val}" ${onEnter ? `onkeydown="if(event.key==='Enter'){event.preventDefault();${onEnter}}"` : ''}><span>${u}</span></div><button type="button" onclick="stepVal('${id}',1,${st})" aria-label="mehr">+</button></div>`;
         }
+        function gabeTiles(slot, p) {
+            const k = slot.split('_')[0], dir = slot.endsWith('_down') ? 'down' : 'up', V = appSettings.volume, cfg = thresholds[k];
+            const dateT = `<label class="gt"><span class="gt-l">Datum</span><input type="date" id="gd_${slot}" value="${isoToday()}" aria-label="Datum"></label>`;
+            if (slot === 'aio_up' || !cfg) return `<div class="gt-row one">${dateT}</div>`;
+            if (!(V > 0) || !(p.effect > 0)) return `<div class="gt-row one">${dateT}</div><div class="rec-meta">🧮 Für die Mengenberechnung oben Nettovolumen und Produktwirkung eintragen.</div>`;
+            const lv = latestValue(k), e = effectiveThr(k), r3 = x => Math.round(x * 1000) / 1000;
+            const tgt = e.target !== undefined ? e.target : (e.minOpt + e.maxOpt) / 2;
+            const when = lv && lv.date ? String(lv.date).split('-').reverse().slice(0, 2).join('.') : '';
+            return `<div class="gt-row">${dateT}
+                <label class="gt"><span class="gt-l">Ist${when ? ' · ' + when : ''}</span><span class="gt-v"><input type="number" step="any" inputmode="decimal" id="cc_${slot}" value="${lv ? r3(lv.v) : ''}" placeholder="–" aria-label="Ist-Wert" oninput="calcShow('${slot}')"><i>${cfg.unit}</i></span></label>
+                <label class="gt"><span class="gt-l">Ziel</span><span class="gt-v"><input type="number" step="any" inputmode="decimal" id="ct_${slot}" value="${r3(tgt)}" placeholder="–" aria-label="Zielwert" oninput="calcShow('${slot}')"><i>${cfg.unit}</i></span></label></div>
+                <div class="gt-res"><div class="calc-res" id="cr_${slot}"></div><button type="button" class="btn-note save" onclick="calcApply('${slot}')">↓ Übernehmen</button></div>`;
+        }
         function doseBlockHtml(slot, p) {
             const u = escapeHtml(p.unit || 'ml'), once = p.mode === 'once';
             const seg = `<div class="seg seg-s" role="group" aria-label="Dosierart"><button type="button" class="${once ? '' : 'active'}" onclick="setProduct('${slot}','mode','')">Täglich</button><button type="button" class="${once ? 'active' : ''}" onclick="setProduct('${slot}','mode','once')">Einzelne Gaben</button></div>`;
             if (once) {
                 const list = dosingLog.map((e, i) => ({ e, i })).filter(x => x.e.kind === 'once' && x.e.slot === slot).sort((a, b) => b.e.ts - a.e.ts).slice(0, 3).map(({ e, i }) => { const d = new Date(e.ts); return `<div class="gabe"><span>${pad2(d.getDate())}.${pad2(d.getMonth() + 1)}.${d.getFullYear()} · ${fmtNum(e.v)} ${u}</span><button type="button" class="thr-link" onclick="deleteGabe(${i})">löschen</button></div>`; }).join('');
-                return seg + `<div class="dl">Datum</div><input type="date" id="gd_${slot}" class="input-styled" value="${isoToday()}" aria-label="Datum"><div class="dl">Menge der Gabe</div>${stepperHtml('ga_' + slot, p, 'Menge', '', `addGabe('${slot}')`)}${slot === 'aio_up' ? '' : `<details class="calc-det in" ${calcOpen ? 'open' : ''} ontoggle="calcOpen=this.open"><summary>Menge berechnen</summary>${calcHtml(slot, slot.split('_')[0], slot.endsWith('_down') ? 'down' : 'up', p)}</details>`}<button type="button" class="btn-note save full big" onclick="addGabe('${slot}')">Gabe eintragen</button>${list ? '<div class="dl">Letzte Gaben</div>' + list : ''}`;
+                return seg + gabeTiles(slot, p) + `<div class="dl">Menge der Gabe</div>${stepperHtml('ga_' + slot, p, 'Menge', '', `addGabe('${slot}')`)}<button type="button" class="btn-note save full big" onclick="addGabe('${slot}')">Gabe eintragen</button>${list ? '<div class="dl">Letzte Gaben</div>' + list : ''}`;
             }
             return seg + `<div class="dl">Menge pro Tag</div>${stepperHtml('dd_' + slot, p, 'Tagesdosis', p.daily || '', `saveDaily('${slot}')`)}<button type="button" class="btn-note save full big" onclick="saveDaily('${slot}')">Tagesdosis speichern</button><details class="pb-mini"><summary>Früheren Tag nachtragen</summary><div class="dose-row wrap" style="margin-top:8px;"><input type="date" id="rd_${slot}" class="input-styled" value="${isoToday()}" aria-label="Datum"><input type="number" step="any" inputmode="decimal" id="rv_${slot}" class="input-styled" placeholder="Menge" aria-label="Menge"><span class="du">${u}</span><button type="button" class="btn-note save" onclick="addDailyFrom('${slot}')">Eintragen</button></div></details>`;
         }
