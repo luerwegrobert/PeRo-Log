@@ -1113,6 +1113,10 @@
         .tile .tile-n { color: var(--pc, #9fb3c0); text-shadow: 0 0 10px color-mix(in srgb, var(--pc, transparent) 70%, transparent); }
         .tile { background-image: linear-gradient(100deg, color-mix(in srgb, var(--pc, transparent) 20%, transparent), transparent 62%); border-color: color-mix(in srgb, var(--pc, #5cc9de) 38%, transparent); box-shadow: 0 0 14px color-mix(in srgb, var(--pc, transparent) 14%, transparent), inset 0 0 18px color-mix(in srgb, var(--pc, transparent) 7%, transparent); }
         .tile.warn { border-color: rgba(230,198,119,0.6); } .tile.crit { border-color: rgba(239,107,122,0.7); }
+        .tile::before { width: 4px; top: 12px; bottom: 12px; background: var(--pc, var(--sc, #5d6f7d)); box-shadow: 0 0 8px color-mix(in srgb, var(--pc, transparent) 60%, transparent); }
+        .tile .tile-n { color: var(--pc, #9fb3c0); text-shadow: none; }
+        .tile { background-image: none; box-shadow: none; border-color: color-mix(in srgb, var(--pc, #5cc9de) 55%, transparent); }
+        .tile.warn { border-color: rgba(230,198,119,0.7); } .tile.crit { border-color: rgba(239,107,122,0.8); }
 </style>
 </head>
 <body>
@@ -4755,7 +4759,7 @@
         }
 
         // ===== Trend-Verlaufskurve =====
-        const paramColors = { aio: '#62d6bb', sal: '#5cc9de', kh: '#4fd6a4', ca: '#c8dc72', mg: '#a89be0', no3: '#eea869', po4: '#ef6b7a', no3_down: '#ffd58f', po4_down: '#ff7a9a', temp: '#e0e6ee', ph: '#e58cc3' };
+        const paramColors = { aio: '#35e8c0', sal: '#27c8ff', kh: '#2bf08a', ca: '#e4ff3a', mg: '#a56bff', no3: '#ff9a2e', po4: '#ff3b5c', no3_down: '#ffc266', po4_down: '#ff6f8a', temp: '#eef3f8', ph: '#ff4fc8' };
         const DAY_MS = 86400000;
         let chartPrefs = loadChartPrefs();
         let chartWindow = { start: 0, end: 1, days: 7, ticks: [] };
