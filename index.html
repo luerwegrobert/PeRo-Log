@@ -3674,7 +3674,7 @@
         // Die erste Eingabe gilt ab dem Tag selbst (die Dosierung lief ja schon), jede spätere Änderung ab dem Folgetag
         const AIO_KEYS = ['kh', 'ca', 'mg'];
         function doseSlotOf(slot) { const p = appSettings.products && appSettings.products[slot]; return p && p.aio ? 'aio_up' : slot; }
-        function doseLabel(k, plain) { return k === 'aio' ? 'All4Reef' : (String(k).endsWith('_down') ? (thresholds[baseKey(k)] ? thresholds[baseKey(k)].label : k) + (plain ? ' senken' : ' ⬇️') : (thresholds[k] ? thresholds[k].label + (DOWN_DOSE.includes(k) ? (plain ? ' erhöhen' : ' ⬆️') : '') : k)); }
+        function doseLabel(k, plain) { if (k === 'sal' || k === 'sal_down') return plain ? (k === 'sal' ? 'Salzgehalt erhöhen' : 'Salzgehalt senken') : (k === 'sal' ? 'Salz ⬆️' : 'Salz ⬇️'); return k === 'aio' ? 'All4Reef' : (String(k).endsWith('_down') ? (thresholds[baseKey(k)] ? thresholds[baseKey(k)].label : k) + (plain ? ' senken' : ' ⬇️') : (thresholds[k] ? thresholds[k].label + (DOWN_DOSE.includes(k) ? (plain ? ' erhöhen' : ' ⬆️') : '') : k)); }
         function doseActive() {
             const out = [], pr = appSettings.products || {};
             if ((pr.aio_up && pr.aio_up.daily > 0) || dosingLog.some(e => e.slot === 'aio_up')) out.push('aio');
@@ -3797,7 +3797,7 @@
                     ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
                     let nm = String(doseLabel(sr.k)); if (nm.length > (/[⬇⬆]/.test(nm) ? 12 : 9)) nm = nm.slice(0, 8) + '…';
                     ctx.font = 'bold 10.5px system-ui, sans-serif'; ctx.fillStyle = col; ctx.fillText(nm, L - 14, top + lh / 2 - 7);
-                    ctx.font = '10px system-ui, sans-serif'; ctx.fillStyle = 'rgba(200,215,225,0.7)'; ctx.fillText(`${rng} ${doseUnit(sr.k)}`, L - 14, top + lh / 2 + 7);
+                    ctx.font = '10px system-ui, sans-serif'; ctx.fillStyle = 'rgba(200,215,225,0.7)'; { const lq = sr.pts[sr.pts.length - 1]; ctx.fillText(sr.k === 'sal' && lq && lq.k1 !== undefined ? `${rnd(lq.k1)}+${rnd(lq.k2)} ml` : `${rng} ${doseUnit(sr.k)}`, L - 14, top + lh / 2 + 7); }
                 });
                 ctx.font = '11px system-ui, sans-serif'; ctx.strokeStyle = 'rgba(255,255,255,0.08)'; ctx.fillStyle = 'rgba(200,215,225,0.7)';
             }
@@ -3924,9 +3924,9 @@
                 if (!sel.has(k)) return;
                 const pp = (appSettings.products && appSettings.products[slotOfKey(k)]) || {};
                 if (pp.mode === 'once' || k.indexOf('sal') === 0) {
-                    const m = {};
-                    dosingLog.forEach(e => { if (e.kind === 'once' && e.slot === slotOfKey(k)) { const dd = startOfDay(e.ts); m[dd] = (m[dd] || 0) + e.v; } });
-                    const bp = Object.keys(m).map(Number).filter(dd => dd + DAY_MS > from && dd <= to).sort((a, b) => a - b).map(dd => ({ ts: dd + DAY_MS / 2, v: m[dd] }));
+                    const m = {}, m1 = {}, m2 = {};
+                    dosingLog.forEach(e => { if (e.kind === 'once' && e.slot === slotOfKey(k)) { const dd = startOfDay(e.ts); m[dd] = (m[dd] || 0) + e.v; if (e.k1 !== undefined) { m1[dd] = (m1[dd] || 0) + e.k1; m2[dd] = (m2[dd] || 0) + e.k2; } } });
+                    const bp = Object.keys(m).map(Number).filter(dd => dd + DAY_MS > from && dd <= to).sort((a, b) => a - b).map(dd => ({ ts: dd + DAY_MS / 2, v: m[dd], k1: m1[dd], k2: m2[dd] }));
                     if (bp.length) series.push({ k, pts: bp, max: Math.max(...bp.map(q => q.v)), bars: true });
                     return;
                 }
@@ -3953,7 +3953,7 @@
             document.getElementById('doseLogList').innerHTML = rows.length ? rows.map(({ e, i }) => {
                 const k = keyOfSlot(e.slot), d = new Date(e.ts);
                 const p = appSettings.products[e.slot] || {};
-                return `<div class="rem-row" style="justify-content:space-between;"><span><b style="color:${paramColors[k]}">${escapeHtml(doseLabel(k))}</b> ${pad2(d.getDate())}.${pad2(d.getMonth() + 1)}.${d.getFullYear()}${(e.kind === 'once' || (e.eff !== undefined && e.eff !== e.ts && e.eff !== startOfDay(e.ts))) ? '' : ' ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes())} · ${e.kind === 'once' ? fmtNum(e.v) + ' ' + (p.unit || 'ml') + ' Einmal-Gabe' : (e.v > 0 ? fmtNum(e.v) + ' ' + (p.unit || 'ml') + ' pro Tag' + (e.eff !== undefined && e.eff !== e.ts && e.eff !== startOfDay(e.ts) ? ' (ab diesem Tag)' : '') : 'keine Dosierung')}</span><button type="button" class="thr-link" onclick="deleteDose(${i})">löschen</button></div>`;
+                return `<div class="rem-row" style="justify-content:space-between;"><span><b style="color:${paramColors[k]}">${escapeHtml(doseLabel(k))}</b> ${pad2(d.getDate())}.${pad2(d.getMonth() + 1)}.${d.getFullYear()}${(e.kind === 'once' || (e.eff !== undefined && e.eff !== e.ts && e.eff !== startOfDay(e.ts))) ? '' : ' ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes())} · ${e.kind === 'once' ? (e.k1 !== undefined ? 'Konz. 1: ' + fmtNum(Math.round(e.k1)) + ' ml + Konz. 2: ' + fmtNum(Math.round(e.k2)) + ' ml' : fmtNum(e.v) + ' ' + (p.unit || 'ml') + ' Einmal-Gabe') : (e.v > 0 ? fmtNum(e.v) + ' ' + (p.unit || 'ml') + ' pro Tag' + (e.eff !== undefined && e.eff !== e.ts && e.eff !== startOfDay(e.ts) ? ' (ab diesem Tag)' : '') : 'keine Dosierung')}</span><button type="button" class="thr-link" onclick="deleteDose(${i})">löschen</button></div>`;
             }).join('') : '<div class="rec-meta">Noch keine Einträge.</div>';
 
             const wrap = cv.parentElement, W = wrap.clientWidth, H = wrap.clientHeight;
