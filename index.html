@@ -823,7 +823,7 @@
         /* ===== Kachel Mini-Graph ===== */
         .tile { min-height: 124px; }
         .tile-u { white-space: nowrap; }
-        .spark { width: 100%; height: 22px; margin-top: 6px; color: var(--sc); display: block; }
+        .spark { width: 100%; height: 26px; margin-top: 6px; color: var(--sc); display: block; }
         /* ===== Produkte: Liste und Detail ===== */
         .plist { display: grid; gap: 8px; }
         .prow { display: flex; align-items: center; gap: 12px; width: 100%; padding: 13px 14px; border-radius: 14px; background: rgba(255,255,255,0.035); border: 1px solid rgba(255,255,255,0.08); color: inherit; font-family: inherit; text-align: left; cursor: pointer; }
@@ -1032,6 +1032,12 @@
         .hs-chart { width: 100%; height: 100px; display: block; border-radius: 10px; }
         .hs-axis { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-muted); margin-top: 2px; }
         .sub-back { display: none !important; }
+        .rec-item { margin: 0 0 10px; padding: 0 14px; border: 1px solid rgba(92, 201, 222, 0.22) !important; border-radius: 16px; background: linear-gradient(180deg, rgba(92, 201, 222, 0.06), rgba(255, 255, 255, 0.02)); }
+        .rec-item[open] { border-color: rgba(92, 201, 222, 0.5) !important; box-shadow: 0 0 20px rgba(92, 201, 222, 0.12); }
+        .rec-item summary { position: relative; padding: 14px 0; }
+        .rec-item summary::after { content: 'Details ›'; flex: 0 0 100%; margin-top: 4px; font-size: 0.78rem; font-weight: 600; color: var(--neon); }
+        .rec-item[open] summary::after { content: 'Weniger anzeigen ˄'; }
+        .rec-hint { font-size: 0.8rem; color: var(--text-muted); margin: 0 0 12px; }
     </style>
 </head>
 <body>
@@ -2060,11 +2066,14 @@
             pts.sort((a, b) => a.t - b.t);
             const p = pts.slice(-10);
             if (!p.length) return '<svg class="spark" viewBox="0 0 100 24" aria-hidden="true"></svg>';
-            const W = 100, H = 24, pad = 3, lo = Math.min(...p.map(x => x.v)), hi = Math.max(...p.map(x => x.v)), rg = hi - lo || 1;
-            const xy = (x, i) => [p.length === 1 ? W / 2 : pad + (W - 2 * pad) * i / (p.length - 1), H - pad - (H - 2 * pad) * (x.v - lo) / rg];
+            const W = 100, H = 24, pad = 3, e = (typeof effectiveThr === 'function' ? effectiveThr(k) : null) || thresholds[k];
+            const lo0 = Math.min(...p.map(x => x.v), e.minOpt), hi0 = Math.max(...p.map(x => x.v), e.maxOpt), m0 = (hi0 - lo0) * 0.12 || 1, lo = lo0 - m0, hi = hi0 + m0, rg = hi - lo;
+            const yv = v => H - pad - (H - 2 * pad) * (v - lo) / rg;
+            const band = `<rect x="0" y="${yv(e.maxOpt).toFixed(1)}" width="${W}" height="${Math.max(2, yv(e.minOpt) - yv(e.maxOpt)).toFixed(1)}" rx="2" fill="#4fd6a4" opacity=".16"/>`;
+            const xy = (x, i) => [p.length === 1 ? W / 2 : pad + (W - 2 * pad) * i / (p.length - 1), yv(x.v)];
             const c = p.map(xy), last = c[c.length - 1];
             const line = p.length > 1 ? `<polyline points="${c.map(a => a[0].toFixed(1) + ',' + a[1].toFixed(1)).join(' ')}" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" opacity=".75"/>` : '';
-            return `<svg class="spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true">${line}<circle cx="${last[0].toFixed(1)}" cy="${last[1].toFixed(1)}" r="2.6" fill="currentColor"/></svg>`;
+            return `<svg class="spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true">${band}${line}<circle cx="${last[0].toFixed(1)}" cy="${last[1].toFixed(1)}" r="2.6" fill="currentColor"/></svg>`;
         }
         function renderDashboard() {
             const grid = document.getElementById('dashboardValues'); if (!grid) return;
@@ -3301,7 +3310,7 @@
             panel.style.display = 'block';
             const warns = rd.inter.filter(x => x.level === 'warn').map(x => `<div class="rec-warn">⚠️ ${x.text}</div>`).join('');
             const body = rd.items.length ? rd.items.map(it => recItemHtml(it, rd)).join('') : '<div class="rec-meta" style="font-size:0.9rem;">✅ Alle zuletzt gemessenen Werte liegen im Sollbereich.</div>';
-            document.getElementById('recList').innerHTML = warns + body;
+            document.getElementById('recList').innerHTML = warns + (rd.items.length ? '<div class="rec-hint">Tippe auf einen Wert, um Ursachen, Maßnahmen und Dosierung zu sehen.</div>' : '') + body;
         }
 
         function logAction(k) {
