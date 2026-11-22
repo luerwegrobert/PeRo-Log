@@ -3959,6 +3959,11 @@
             const u = escapeHtml(p.unit || 'ml'), st = (p.unit === 'Tropfen' || p.unit === 'Tabletten') ? 1 : 0.1;
             return `<div class="stepper"><button type="button" onclick="stepVal('${id}',-1,${st})" aria-label="weniger">−</button><div class="st-mid"><input type="number" step="any" inputmode="decimal" id="${id}" placeholder="0" aria-label="${ph}" value="${val}" ${onEnter ? `onkeydown="if(event.key==='Enter'){event.preventDefault();${onEnter}}"` : ''}><span>${u}</span></div><button type="button" onclick="stepVal('${id}',1,${st})" aria-label="mehr">+</button></div>`;
         }
+        function setZiel(k, v) {
+            const n = parseFloat(String(v).replace(',', '.')); if (!isFinite(n) || n <= 0) return;
+            const u = Object.assign({}, userThr[k] || {}); u.target = n; userThr[k] = u; saveThr();
+            showToast('Zielwert gespeichert: ' + fmtNum(n) + ' ' + (thresholds[k].unit || ''));
+        }
         function gabeTiles(slot, p) {
             const k = slot.split('_')[0], dir = slot.endsWith('_down') ? 'down' : 'up', V = appSettings.volume, cfg = thresholds[k];
             const dateT = `<label class="gt"><span class="gt-l">Datum</span><input type="date" id="gd_${slot}" value="${isoToday()}" aria-label="Datum"></label>`;
@@ -3969,7 +3974,7 @@
             const when = lv && lv.date ? String(lv.date).split('-').reverse().slice(0, 2).join('.') : '';
             return `<div class="gt-row">${dateT}
                 <label class="gt"><span class="gt-l">Ist <em>${cfg.unit}</em></span><span class="gt-v"><input type="number" step="any" inputmode="decimal" id="cc_${slot}" value="${lv ? r3(lv.v) : ''}" placeholder="–" aria-label="Ist-Wert" oninput="calcShow('${slot}')"></span></label>
-                <label class="gt"><span class="gt-l">Ziel <em>${cfg.unit}</em></span><span class="gt-v"><input type="number" step="any" inputmode="decimal" id="ct_${slot}" value="${r3(tgt)}" placeholder="–" aria-label="Zielwert" oninput="calcShow('${slot}')"></span></label></div>
+                <label class="gt"><span class="gt-l">Ziel <em>${cfg.unit}</em></span><span class="gt-v"><input type="number" step="any" inputmode="decimal" id="ct_${slot}" value="${r3(tgt)}" placeholder="–" aria-label="Zielwert" oninput="calcShow('${slot}')" onchange="setZiel('${k}', this.value)"></span></label></div>
                 <div class="gt-res"><div class="calc-res" id="cr_${slot}"></div><button type="button" class="btn-note save" onclick="calcApply('${slot}')">↓ Übernehmen</button></div>`;
         }
         function saltDoseCalc() {
