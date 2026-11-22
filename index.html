@@ -1057,6 +1057,8 @@
         .salt-row:last-of-type { border-bottom: 0; } .salt-row b { font-size: 1.25rem; text-align: right; } .salt-row b small { display: block; font-size: 0.7rem; color: var(--text-muted); font-weight: 500; }
         .salt-row.k1 b { color: #5cc9de; } .salt-row.k2 b { color: #a89be0; }
         .hub .health-num small.hl { letter-spacing: 0.02em; font-weight: 700; margin-top: 6px; max-width: 78%; text-align: center; line-height: 1.15; }
+        .calc-det.in { margin: 10px 0 0; background: rgba(92, 201, 222, 0.04); border-color: rgba(92, 201, 222, 0.2); }
+        .step input[type=date], .dose-row input[type=date] { box-sizing: border-box; max-width: 100%; min-width: 0; -webkit-appearance: none; appearance: none; display: block; text-align: left; min-height: 2.6em; }
     </style>
 </head>
 <body>
@@ -3918,7 +3920,7 @@
             const seg = `<div class="seg seg-s" role="group" aria-label="Dosierart"><button type="button" class="${once ? '' : 'active'}" onclick="setProduct('${slot}','mode','')">Täglich</button><button type="button" class="${once ? 'active' : ''}" onclick="setProduct('${slot}','mode','once')">Einzelne Gaben</button></div>`;
             if (once) {
                 const list = dosingLog.map((e, i) => ({ e, i })).filter(x => x.e.kind === 'once' && x.e.slot === slot).sort((a, b) => b.e.ts - a.e.ts).slice(0, 3).map(({ e, i }) => { const d = new Date(e.ts); return `<div class="gabe"><span>${pad2(d.getDate())}.${pad2(d.getMonth() + 1)}.${d.getFullYear()} · ${fmtNum(e.v)} ${u}</span><button type="button" class="thr-link" onclick="deleteGabe(${i})">löschen</button></div>`; }).join('');
-                return seg + `<div class="dl">Datum</div><input type="date" id="gd_${slot}" class="input-styled" value="${isoToday()}" aria-label="Datum"><div class="dl">Menge der Gabe</div>${stepperHtml('ga_' + slot, p, 'Menge', '', `addGabe('${slot}')`)}<button type="button" class="btn-note save full big" onclick="addGabe('${slot}')">Gabe eintragen</button>${list ? '<div class="dl">Letzte Gaben</div>' + list : ''}`;
+                return seg + `<div class="dl">Datum</div><input type="date" id="gd_${slot}" class="input-styled" value="${isoToday()}" aria-label="Datum"><div class="dl">Menge der Gabe</div>${stepperHtml('ga_' + slot, p, 'Menge', '', `addGabe('${slot}')`)}${slot === 'aio_up' ? '' : `<details class="calc-det in" ${calcOpen ? 'open' : ''} ontoggle="calcOpen=this.open"><summary>Menge berechnen</summary>${calcHtml(slot, slot.split('_')[0], slot.endsWith('_down') ? 'down' : 'up', p)}</details>`}<button type="button" class="btn-note save full big" onclick="addGabe('${slot}')">Gabe eintragen</button>${list ? '<div class="dl">Letzte Gaben</div>' + list : ''}`;
             }
             return seg + `<div class="dl">Menge pro Tag</div>${stepperHtml('dd_' + slot, p, 'Tagesdosis', p.daily || '', `saveDaily('${slot}')`)}<button type="button" class="btn-note save full big" onclick="saveDaily('${slot}')">Tagesdosis speichern</button><details class="pb-mini"><summary>Früheren Tag nachtragen</summary><div class="dose-row wrap" style="margin-top:8px;"><input type="date" id="rd_${slot}" class="input-styled" value="${isoToday()}" aria-label="Datum"><input type="number" step="any" inputmode="decimal" id="rv_${slot}" class="input-styled" placeholder="Menge" aria-label="Menge"><span class="du">${u}</span><button type="button" class="btn-note save" onclick="addDailyFrom('${slot}')">Eintragen</button></div></details>`;
         }
@@ -4033,7 +4035,7 @@
                         </div>
                         <button type="button" class="btn-note save full" onclick="if(document.activeElement)document.activeElement.blur();showToast('Produkt gespeichert ✓')">Produkt speichern</button></div>`;
                     if (hasD) h += `<div class="step"><div class="step-h">Dosierung</div>${doseBlockHtml(slot, p)}</div>`;
-                    h += `<details class="calc-det"${calcOpen ? ' open' : ''} ontoggle="calcOpen=this.open"><summary>Menge berechnen</summary>${calcHtml(slot, k, dir, p)}</details>`;
+                    if (!hasD) h += `<details class="calc-det"${calcOpen ? ' open' : ''} ontoggle="calcOpen=this.open"><summary>Menge berechnen</summary>${calcHtml(slot, k, dir, p)}</details>`;
                 }
                 root.innerHTML = h;
                 root.querySelectorAll('[id^="cr_"]').forEach(el => calcShow(el.id.slice(3)));
