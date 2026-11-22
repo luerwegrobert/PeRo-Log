@@ -752,9 +752,11 @@
         header { margin-bottom: 14px !important; padding-top: calc(10px + env(safe-area-inset-top, 0px)) !important; padding-bottom: 10px !important; }
         header h1 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
         .brand { display: flex; align-items: center; justify-content: center; gap: 12px; }
-        .brand-mark { width: 46px; height: 46px; border-radius: 50%; display: block; box-shadow: 0 0 18px rgba(92, 201, 222, 0.25); }
+        .brand-mark { width: 62px; height: 62px; border-radius: 50%; display: block; box-shadow: 0 0 0 1px rgba(150, 190, 210, 0.25), 0 0 22px rgba(92, 201, 222, 0.3); }
         .brand-text { text-align: left; }
-        .brand-name { font-size: 1.35rem; font-weight: 700; letter-spacing: 0.06em; line-height: 1.1; background: linear-gradient(180deg, #f2f6f9, #9fb2c0); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+        .brand-name { font-size: 1.55rem; font-weight: 700; letter-spacing: 0.05em; line-height: 1.1; }
+        .brand-name .b1 { background: linear-gradient(180deg, #f6f9fb, #a9bac7); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+        .brand-name .b2 { color: var(--color-sal); font-weight: 600; }
         header .copyright { margin-top: 2px; }
 
         /* ===== Navigation unten ===== */
@@ -803,6 +805,56 @@
         .health-lines { font-size: 0.8rem; color: var(--text-muted); line-height: 1.6; }
         .health-lines .d { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 7px; }
         .health-more { margin-top: 6px; font-size: 0.74rem; color: var(--color-sal); font-weight: 600; }
+
+        /* ===== Werte rund um den Ring ===== */
+        .hub { display: grid; grid-template-columns: 1fr 1.15fr 1fr; gap: 8px; margin-bottom: 4px; }
+        .tile { position: relative; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 1px; min-height: 100px; min-width: 0; padding: 10px 10px 9px 13px; border-radius: 16px; background: rgba(255, 255, 255, 0.035); border: 1px solid rgba(255, 255, 255, 0.08); color: inherit; font-family: inherit; text-align: left; cursor: pointer; overflow: hidden; transition: transform .15s; }
+        .tile:active { transform: scale(0.97); }
+        .tile::before { content: ''; position: absolute; left: 0; top: 14px; bottom: 14px; width: 3px; border-radius: 0 3px 3px 0; background: var(--sc, #5d6f7d); }
+        .tile.ok { --sc: var(--status-green); } .tile.warn { --sc: var(--status-yellow); border-color: rgba(230, 198, 119, 0.3); } .tile.crit { --sc: var(--status-red); border-color: rgba(239, 107, 122, 0.4); background: rgba(239, 107, 122, 0.07); } .tile.none { --sc: #5d6f7d; }
+        .tile-n { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.6rem; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; color: var(--text-muted); }
+        .tile-v { font-size: 1.5rem; font-weight: 700; line-height: 1.15; color: var(--sc); margin-top: 3px; }
+        .tile.none .tile-v { color: var(--text-muted); }
+        .tile-u { font-size: 0.7rem; color: var(--text-muted); }
+        .tile-s { display: flex; align-items: center; gap: 5px; margin-top: 5px; font-size: 0.64rem; font-weight: 600; color: var(--sc); }
+        .tile-s i { width: 6px; height: 6px; border-radius: 50%; background: var(--sc); flex: none; }
+        .hub-ring { display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .hub .health-ring { width: 100%; height: auto; aspect-ratio: 1 / 1; flex: none; }
+        .hub .health-num b { font-size: 1.75rem; }
+        .hub-cap { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 12px; padding: 12px 14px; border-radius: 14px; background: rgba(92, 201, 222, 0.06); border: 1px solid rgba(150, 190, 210, 0.14); cursor: pointer; }
+        .cap-t { font-weight: 700; font-size: 0.95rem; }
+        .cap-s { font-size: 0.76rem; color: var(--text-muted); margin-top: 2px; line-height: 1.4; }
+        .cap-link { color: var(--color-sal); font-weight: 600; font-size: 0.85rem; white-space: nowrap; }
+        .hub-help { margin-top: 8px; font-size: 0.72rem; color: var(--text-muted); line-height: 1.45; }
+        .welcome { margin-top: 12px; padding: 16px; border-radius: 16px; background: rgba(92, 201, 222, 0.07); border: 1px solid rgba(92, 201, 222, 0.22); }
+        .w-t { font-weight: 700; font-size: 1.05rem; } .w-s { font-size: 0.82rem; color: var(--text-muted); margin: 4px 0 8px; }
+        .welcome ol { margin: 0 0 0 18px; font-size: 0.86rem; line-height: 1.6; }
+
+        /* ===== Produkte und Dosierung: klare Abschnitte ===== */
+        .how { display: grid; gap: 8px; margin-bottom: 14px; }
+        .how div { display: flex; gap: 10px; align-items: flex-start; font-size: 0.82rem; color: var(--text-muted); line-height: 1.45; }
+        .how b { flex: none; width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 0.72rem; color: var(--color-sal); border: 1px solid rgba(92, 201, 222, 0.5); }
+        .pb-sec { margin: 6px 0 10px; }
+        .pb-h { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin: 4px 0 8px; }
+        .pb-lab { font-size: 0.74rem; color: var(--text-muted); margin: 10px 0 4px; }
+        .pb-det { margin-top: 8px; border-radius: 14px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.07); padding: 0 12px; }
+        .pb-det > summary { cursor: pointer; list-style: none; padding: 12px 0; font-weight: 600; font-size: 0.92rem; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+        .pb-det > summary::-webkit-details-marker { display: none; }
+        .pb-det > summary::after { content: '›'; margin-left: auto; font-size: 1.3rem; color: var(--text-muted); transition: transform .2s; }
+        .pb-det[open] > summary::after { transform: rotate(90deg); }
+        .pb-det > summary span { font-weight: 400; font-size: 0.76rem; color: var(--text-muted); margin-left: auto; max-width: 52%; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .pb-det[open] { padding-bottom: 12px; }
+        .pb-mini { margin-top: 10px; font-size: 0.82rem; }
+        .pb-mini > summary { cursor: pointer; color: var(--color-sal); padding: 4px 0; }
+        .dose-form { margin-top: 12px; }
+        .dose-form > label { display: block; font-size: 0.82rem; font-weight: 600; margin-bottom: 6px; }
+        .dose-in { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .dose-in input { width: 7.5em; flex: 0 1 auto; }
+        .dose-in input[type=date] { width: 9.5em; }
+        .dose-in span { font-size: 0.84rem; color: var(--text-muted); }
+        .dose-form > .btn-note { margin-top: 10px; width: 100%; padding: 11px; }
+        .seg-s { margin: 4px 0 0; }
+        .seg-s button { font-size: 0.8rem; padding: 7px 4px; }
         .action-row {
             display: flex;
             gap: 10px;
@@ -873,10 +925,10 @@
 
     <header>
         <div class="brand">
-            <img class="brand-mark" alt="" src="data:image/webp;base64,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">
+            <img class="brand-mark" alt="" src="data:image/webp;base64,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">
             <div class="brand-text">
                 <h1>PeRo Log</h1>
-                <div class="brand-name" aria-hidden="true">PeRo Log</div>
+                <div class="brand-name" aria-hidden="true"><span class="b1">PeRo</span> <span class="b2">Log</span></div>
                 <div class="copyright">Riff-Logbuch · © P.Grewe &amp; R.Luerweg</div>
             </div>
         </div>
@@ -919,7 +971,7 @@
             <div class="glass-panel">
                 <div class="panel-title">Beckenstatus</div>
                 <div id="healthCard"></div>
-                <div class="dashboard-grid" id="dashboardValues">
+                <div class="hub" id="dashboardValues">
                     <!-- Dynamic rendering via JS -->
                 </div>
             </div>
@@ -1075,8 +1127,8 @@
             </div>
 
             <div class="glass-panel" id="productSettings">
-                <h2 style="font-size:1.1rem; margin-bottom:6px;">🧪 Produkte &amp; Dosierung</h2>
-                <div style="font-size: 0.8rem; color: var(--text-muted); margin: 10px 0;">Trage hier deine eigenen Produkte ein, so wie auf dem Etikett angegeben, z. B. „1 ml erhöht KH um 0,1 dKH in 100 Litern“. Bei KH, Calcium, Nitrat und Phosphat kannst du zusätzlich deine aktuelle Tagesdosis eintragen. Alle Mengenangaben in den Empfehlungen werden daraus berechnet.</div>
+                <h2 style="font-size:1.1rem; margin-bottom:10px;">Produkte &amp; Dosierung</h2>
+                <div class="how"><div><b>1</b><span>Nettovolumen eintragen</span></div><div><b>2</b><span>Wert öffnen, bei „Produkt einrichten“ die Etikett-Angaben eintragen</span></div><div><b>3</b><span>Bei „Dosierung“ deine Tagesdosis speichern. Der Verlauf erscheint oben unter „Verlauf“.</span></div></div>
                 <div id="productRows"></div>
             </div>
         </div>
@@ -1271,20 +1323,25 @@
             });
             return { n, score: n ? Math.round(pts / n * 100) : null, opt, warn, crit, none, last };
         }
+        function healthRingHtml(h) {
+            const R = 50, C = 2 * Math.PI * R;
+            if (h.score === null) return `<div class="hub-ring" onclick="navGo('input')" role="button" aria-label="Noch keine Messwerte, Messung eintragen"><div class="health-ring" style="--hc:#5cc9de"><svg viewBox="0 0 120 120"><circle class="trk" cx="60" cy="60" r="${R}"/></svg><div class="health-num"><b>–</b><small>Gesundheit</small></div></div></div>`;
+            const col = h.score >= 85 ? '#4fd6a4' : h.score >= 60 ? '#e6c677' : '#ef6b7a';
+            return `<div class="hub-ring" onclick="navGo('rec')" role="button" aria-label="Beckengesundheit ${h.score} von 100, Tipps öffnen"><div class="health-ring" style="--hc:${col}"><svg viewBox="0 0 120 120"><circle class="trk" cx="60" cy="60" r="${R}"/><circle class="arc" id="healthArc" cx="60" cy="60" r="${R}" stroke-dasharray="0 ${C.toFixed(1)}" data-len="${(C * h.score / 100).toFixed(1)} ${C.toFixed(1)}"/></svg><div class="health-num"><b>${h.score}</b><small>Gesundheit</small></div></div></div>`;
+        }
         function renderHealth() {
             const box = document.getElementById('healthCard'); if (!box) return;
-            const h = healthSummary(), R = 50, C = 2 * Math.PI * R;
-            if (h.score === null) {
-                box.innerHTML = `<div class="health" onclick="navGo('input')" role="button"><div class="health-ring" style="--hc:#5cc9de"><svg viewBox="0 0 120 120"><circle class="trk" cx="60" cy="60" r="${R}"/></svg><div class="health-num"><b>–</b><small>Gesundheit</small></div></div><div class="health-info"><div class="health-title">Noch keine Messwerte</div><div class="health-lines">Trage deine erste Messung ein, dann erscheint hier der Zustand deines Beckens.</div><div class="health-more">Jetzt messen ›</div></div></div>`;
+            if (!records.length) {
+                box.innerHTML = `<div class="welcome"><div class="w-t">Willkommen bei PeRo Log</div><div class="w-s">Dein Riff-Logbuch in drei Schritten:</div><ol><li><b>Messen</b> – trage deine erste Messung ein.</li><li><b>Dosieren</b> – richte deine Produkte und Dosierung ein (optional).</li><li><b>Tipps</b> – lies die Hinweise zu deinen Werten.</li></ol><button type="button" class="btn-submit" style="margin-top:12px;" onclick="navGo('input')">Erste Messung eintragen</button></div>`;
                 return;
             }
-            const col = h.score >= 85 ? '#4fd6a4' : h.score >= 60 ? '#e6c677' : '#ef6b7a';
+            const h = healthSummary();
+            if (h.score === null) { box.innerHTML = ''; return; }
             const title = h.crit ? (h.crit === 1 ? 'Ein Wert ist kritisch' : h.crit + ' Werte sind kritisch') : h.warn ? (h.score >= 85 ? 'Fast perfekt' : 'Einzelne Werte beachten') : 'Alle Werte im Soll';
-            const line = (c, t) => `<div><span class="d" style="background:${c}"></span>${t}</div>`;
+            const parts = [];
+            if (h.opt) parts.push(h.opt + ' optimal'); if (h.warn) parts.push(h.warn + (h.warn === 1 ? ' Warnung' : ' Warnungen')); if (h.crit) parts.push(h.crit + ' kritisch'); if (h.none) parts.push(h.none + ' ohne Messung');
             const ld = h.last ? new Date(h.last) : null;
-            const lines = [h.opt ? line('#4fd6a4', h.opt + ' optimal') : '', h.warn ? line('#e6c677', h.warn + (h.warn === 1 ? ' Warnung' : ' Warnungen')) : '', h.crit ? line('#ef6b7a', h.crit + ' kritisch') : '', h.none ? line('#5d6f7d', h.none + ' ohne Messung') : ''].join('');
-            box.innerHTML = `<div class="health" onclick="navGo('rec')" role="button" aria-label="Beckengesundheit ${h.score} Prozent, Tipps öffnen"><div class="health-ring" style="--hc:${col}"><svg viewBox="0 0 120 120"><circle class="trk" cx="60" cy="60" r="${R}"/><circle class="arc" id="healthArc" cx="60" cy="60" r="${R}" stroke-dasharray="0 ${C.toFixed(1)}"/></svg><div class="health-num"><b>${h.score}</b><small>Gesundheit</small></div></div><div class="health-info"><div class="health-title">${title}</div><div class="health-lines">${lines}${ld ? `<div style="margin-top:3px;">Letzte Messung ${pad2(ld.getDate())}.${pad2(ld.getMonth() + 1)}.</div>` : ''}</div><div class="health-more">Tipps ansehen ›</div></div></div>`;
-            requestAnimationFrame(() => requestAnimationFrame(() => { const a = document.getElementById('healthArc'); if (a) a.setAttribute('stroke-dasharray', (C * h.score / 100).toFixed(1) + ' ' + C.toFixed(1)); }));
+            box.innerHTML = `<div class="hub-cap" onclick="navGo('rec')" role="button"><div><div class="cap-t">${title}</div><div class="cap-s">${parts.join(' · ')}${ld ? ' · Letzte Messung ' + pad2(ld.getDate()) + '.' + pad2(ld.getMonth() + 1) + '.' : ''}</div></div><span class="cap-link">Tipps ›</span></div><div class="hub-help">Tippe auf einen Wert für Verlauf und Details. Die Zahl im Ring (0 bis 100) zeigt, wie viele Werte im Soll liegen.</div>`;
         }
 
         function switchTab(tabId) {
@@ -1834,51 +1891,18 @@
             </svg><div class="spark-cap" style="color:${color};font-weight:600;">${trend}</div><div class="spark-cap">${detail}</div></div>`;
         }
         function renderDashboard() {
-            const grid = document.getElementById('dashboardValues');
-            grid.innerHTML = '';
-            
-            // Get latest non-null item for each individual parameter
-            const latestValues = {};
-            const latestMeta = {};
-            
-            // Go backwards from newest to find last entry per type
-            const reversed = [...records].reverse();
-            
-            Object.keys(thresholds).forEach(param => {
-                const found = reversed.find(r => r.values[param] !== null && r.values[param] !== '');
-                if(found) {
-                    latestValues[param] = found.values[param];
-                    latestMeta[param] = { type: found.type, date: found.date, time: found.time };
-                } else {
-                    latestValues[param] = null;
-                }
+            const grid = document.getElementById('dashboardValues'); if (!grid) return;
+            const keys = Object.keys(thresholds), h = healthSummary(), cells = [];
+            keys.forEach(k => {
+                const lv = latestValue(k), cfg = thresholds[k];
+                const st = lv ? getStatusColorClass(k, String(lv.v)) : null;
+                const cls = !st ? 'none' : st.label === 'Optimal' ? 'ok' : st.label === 'Warnung' ? 'warn' : 'crit';
+                const val = lv ? String(lv.v) : '–', stl = st ? st.label : 'Keine Daten';
+                cells.push(`<button type="button" class="tile ${cls}" onclick="openDetail('${k}')" aria-label="${escapeHtml(cfg.label)}: ${val} ${escapeHtml(cfg.unit || '')}, ${stl}"><span class="tile-n">${escapeHtml(cfg.label)}</span><span class="tile-v">${val}</span><span class="tile-u">${escapeHtml(cfg.unit || '\u00a0')}</span><span class="tile-s"><i></i>${stl}</span></button>`);
             });
-
-            Object.keys(thresholds).forEach(param => {
-                const val = latestValues[param];
-                const stat = getStatusColorClass(param, val);
-                const meta = latestMeta[param];
-                const cfg = thresholds[param];
-                let spark = ''; try { spark = sparkSvg(param, stat.color); } catch (e) { console.error(e); }
-                
-                let cardHtml = `
-                    <div class="param-card ${param}" onclick="openDetail('${param}')" style="cursor:pointer;" role="button" aria-label="Details zu ${cfg.label}">
-                        <div class="param-header">
-                            <span>${cfg.label}</span>
-                            ${val ? `<span class="status-badge ${stat.badge}">${stat.label}</span>` : ''}
-                        </div>
-                        <div class="param-value" style="color: ${stat.color};">
-                            ${val ? val + `<span style="font-size:0.8rem; font-weight:500; color:var(--text-muted);"> ${cfg.unit}</span>` : '<span style="color:var(--text-muted); font-size:1.1rem;">Keine Daten</span>'}
-                        </div>
-                        <div class="param-meta">
-                            <span>Soll: ${cfg.minOpt}-${cfg.maxOpt}</span>
-                            <span>${meta ? meta.date.split('-').reverse().slice(0,2).join('.') + (meta.time ? '<span class="mt"> ' + meta.time + '</span>' : '') : ''} (${meta ? (meta.type === 'Heimtest' ? '🏠' : '🧪') : '-'})</span>
-                        </div>
-                        ${spark}
-                    </div>
-                `;
-                grid.innerHTML += cardHtml;
-            });
+            cells.splice(Math.min(4, cells.length), 0, healthRingHtml(h));
+            grid.innerHTML = cells.join('');
+            requestAnimationFrame(() => requestAnimationFrame(() => { const a = document.getElementById('healthArc'); if (a && a.dataset.len) a.setAttribute('stroke-dasharray', a.dataset.len); }));
             try { renderHealth(); } catch (e) { console.error(e); }
         }
 
@@ -3527,33 +3551,13 @@
         }
 
         function doseBlockHtml(slot, p) {
-            return `<div class="prod-line">
-                            <span>Dosierart:</span>
-                            <select class="input-styled" onchange="setProduct('${slot}','mode',this.value)">
-                                <option value="daily"${p.mode === 'once' ? '' : ' selected'}>Tagesdosis (läuft täglich weiter)</option>
-                                <option value="once"${p.mode === 'once' ? ' selected' : ''}>Einmal-Gabe (ich trage jede Gabe ein)</option>
-                            </select>
-                        </div>` + (p.mode === 'once' ? `<div class="prod-line">
-                            <span>Gabe am</span>
-                            <input type="date" id="gd_${slot}" class="input-styled" value="${isoToday()}">
-                            <input type="number" step="any" inputmode="decimal" id="ga_${slot}" class="input-styled" placeholder="Menge">
-                            <span>${escapeHtml(p.unit || 'ml')}</span>
-                            <button type="button" class="btn-note save" onclick="addGabe('${slot}')">➕ Eintragen</button>
-                        </div>
-                        ${dosingLog.map((e, i) => ({ e, i })).filter(x => x.e.kind === 'once' && x.e.slot === slot).sort((a, b) => b.e.ts - a.e.ts).slice(0, 5).map(({ e, i }) => { const d = new Date(e.ts); return `<div class="rem-row" style="justify-content:space-between;"><span>${pad2(d.getDate())}.${pad2(d.getMonth() + 1)}.${d.getFullYear()} · ${fmtNum(e.v)} ${escapeHtml(p.unit || 'ml')}</span><button type="button" class="thr-link" onclick="deleteGabe(${i})">löschen</button></div>`; }).join('') || '<div class="rec-meta">Noch keine Gabe eingetragen.</div>'}` : `<div class="prod-line">
-                            <span>Meine Tagesdosis:</span>
-                            <input type="number" step="any" inputmode="decimal" id="dd_${slot}" class="input-styled" placeholder="z. B. 2" value="${p.daily || ''}" onkeydown="if(event.key==='Enter'){event.preventDefault();saveDaily('${slot}')}">
-                            <span>${escapeHtml(p.unit || 'ml')} pro Tag (für dein Nettovolumen)</span>
-                            <button type="button" class="btn-note save" onclick="saveDaily('${slot}')">✅ Speichern</button>
-                        </div>
-                        <div class="prod-line">
-                            <span>Nachtragen ab</span>
-                            <input type="date" id="rd_${slot}" class="input-styled" value="${isoToday()}">
-                            <input type="number" step="any" inputmode="decimal" id="rv_${slot}" class="input-styled" placeholder="Menge">
-                            <span>${escapeHtml(p.unit || 'ml')}</span>
-                            <button type="button" class="btn-note save" onclick="addDailyFrom('${slot}')">➕ Eintragen</button>
-                        </div>
-                        <div class="rec-meta">Tippe auf „Speichern“, damit die Tagesdosis übernommen wird. Sie gilt sofort und läuft täglich weiter, bis du sie änderst. Mit „Nachtragen ab“ trägst du sie für einen früheren Tag nach.</div>`);
+            const u = escapeHtml(p.unit || 'ml'), once = p.mode === 'once';
+            const seg = `<div class="seg seg-s" role="group" aria-label="Dosierart"><button type="button" class="${once ? '' : 'active'}" onclick="setProduct('${slot}','mode','')">Täglich</button><button type="button" class="${once ? 'active' : ''}" onclick="setProduct('${slot}','mode','once')">Einzelne Gaben</button></div>`;
+            if (once) {
+                const list = dosingLog.map((e, i) => ({ e, i })).filter(x => x.e.kind === 'once' && x.e.slot === slot).sort((a, b) => b.e.ts - a.e.ts).slice(0, 5).map(({ e, i }) => { const d = new Date(e.ts); return `<div class="rem-row" style="justify-content:space-between;"><span>${pad2(d.getDate())}.${pad2(d.getMonth() + 1)}.${d.getFullYear()} · ${fmtNum(e.v)} ${u}</span><button type="button" class="thr-link" onclick="deleteGabe(${i})">löschen</button></div>`; }).join('') || '<div class="rec-meta">Noch keine Gabe eingetragen.</div>';
+                return seg + `<div class="dose-form"><label for="ga_${slot}">Neue Gabe</label><div class="dose-in"><input type="date" id="gd_${slot}" class="input-styled" value="${isoToday()}"><input type="number" step="any" inputmode="decimal" id="ga_${slot}" class="input-styled" placeholder="Menge"><span>${u}</span></div><button type="button" class="btn-note save" onclick="addGabe('${slot}')">Eintragen</button></div><div class="rec-meta">Trage jede Gabe einzeln ein. Sie erscheint im Verlauf an dem Tag der Gabe.</div><div class="pb-lab">Letzte Gaben</div>${list}`;
+            }
+            return seg + `<div class="dose-form"><label for="dd_${slot}">Meine Tagesdosis</label><div class="dose-in"><input type="number" step="any" inputmode="decimal" id="dd_${slot}" class="input-styled" placeholder="z. B. 2" value="${p.daily || ''}" onkeydown="if(event.key==='Enter'){event.preventDefault();saveDaily('${slot}')}"><span>${u} pro Tag</span></div><button type="button" class="btn-note save" onclick="saveDaily('${slot}')">Speichern</button></div><div class="rec-meta">Gilt ab sofort und läuft täglich weiter, bis du sie änderst.</div><details class="pb-mini"><summary>Für einen früheren Tag nachtragen</summary><div class="dose-in" style="margin-top:8px;"><input type="date" id="rd_${slot}" class="input-styled" value="${isoToday()}"><input type="number" step="any" inputmode="decimal" id="rv_${slot}" class="input-styled" placeholder="Menge"><span>${u}</span></div><button type="button" class="btn-note save" style="margin-top:8px;" onclick="addDailyFrom('${slot}')">Eintragen</button></details>`;
         }
 
         function calcDose(slot, delta) {
@@ -3623,7 +3627,9 @@
             </div>`;
         }
 
-        const prodOpen = new Set();
+        const prodOpen = new Set(), prodSub = {};
+        function subOpen(key, def) { return (key in prodSub ? prodSub[key] : def) ? ' open' : ''; }
+        function subToggle(key, open) { prodSub[key] = open; }
         function prodToggle(slot, open) { if (open) prodOpen.add(slot); else prodOpen.delete(slot); }
         function prodSummary(slot, p) {
             const parts = [];
@@ -3657,20 +3663,26 @@
                         return;
                     }
                     const units = ['ml', 'g', 'Tropfen', 'Tabletten'];
+                    const configured = !!(p.name && p.effect > 0), hasD = hasDoseBlock(k, dir);
                     html += `<details class="prod-block prod-acc"${prodOpen.has(slot) ? ' open' : ''} ontoggle="prodToggle('${slot}',this.open)">
                         <summary class="prod-title" style="color:${paramColors[k]}">${cfg.label} · ${dir === 'up' ? '⬆️ erhöhen' : '⬇️ senken'}<span class="prod-sum">${prodSummary(slot, p)}</span></summary>
-                        <input type="text" class="input-styled" placeholder="Produktname" value="${escapeHtml(p.name || '')}" onchange="setProduct('${slot}','name',this.value)">
-                        <div class="prod-line">
-                            <input type="number" step="any" inputmode="decimal" class="input-styled" placeholder="1" value="${p.amount || ''}" onchange="setProduct('${slot}','amount',this.value)">
-                            <select class="input-styled" onchange="setProduct('${slot}','unit',this.value)">${units.map(u => `<option${(p.unit || 'ml') === u ? ' selected' : ''}>${u}</option>`).join('')}</select>
-                            <span>${dir === 'up' ? 'erhöht' : 'senkt'} ${cfg.label} um</span>
-                            <input type="number" step="any" inputmode="decimal" class="input-styled" placeholder="${cfg.unit === 'psu' ? '1' : '0,1'}" value="${p.effect || ''}" onchange="setProduct('${slot}','effect',this.value)">
-                            <span>${cfg.unit} in</span>
-                            <input type="number" step="any" inputmode="decimal" class="input-styled" placeholder="100" value="${p.per || ''}" onchange="setProduct('${slot}','per',this.value)">
-                            <span>Litern</span>
-                        </div>
-                        ${calcHtml(slot, k, dir, p)}
-                        ${hasDoseBlock(k, dir) ? doseBlockHtml(slot, p) : ''}
+                        ${hasD ? `<div class="pb-sec"><div class="pb-h">Dosierung</div>${doseBlockHtml(slot, p)}</div>` : ''}
+                        <details class="pb-det"${subOpen(slot + ':calc', false)} ontoggle="subToggle('${slot}:calc',this.open)"><summary>Menge berechnen<span>Wie viel brauche ich?</span></summary>${calcHtml(slot, k, dir, p)}</details>
+                        <details class="pb-det"${subOpen(slot + ':setup', !configured)} ontoggle="subToggle('${slot}:setup',this.open)"><summary>Produkt einrichten<span>${configured ? escapeHtml(p.name) : 'Name und Wirkung eintragen'}</span></summary>
+                            <div class="pb-lab">Produktname</div>
+                            <input type="text" class="input-styled" placeholder="z. B. Grotech Phosphat Plus" value="${escapeHtml(p.name || '')}" onchange="setProduct('${slot}','name',this.value)">
+                            <div class="pb-lab">Wirkung laut Etikett</div>
+                            <div class="prod-line">
+                                <input type="number" step="any" inputmode="decimal" class="input-styled" placeholder="1" value="${p.amount || ''}" onchange="setProduct('${slot}','amount',this.value)">
+                                <select class="input-styled" onchange="setProduct('${slot}','unit',this.value)">${units.map(u => `<option${(p.unit || 'ml') === u ? ' selected' : ''}>${u}</option>`).join('')}</select>
+                                <span>${dir === 'up' ? 'erhöht' : 'senkt'} ${cfg.label} um</span>
+                                <input type="number" step="any" inputmode="decimal" class="input-styled" placeholder="${cfg.unit === 'psu' ? '1' : '0,1'}" value="${p.effect || ''}" onchange="setProduct('${slot}','effect',this.value)">
+                                <span>${cfg.unit} in</span>
+                                <input type="number" step="any" inputmode="decimal" class="input-styled" placeholder="100" value="${p.per || ''}" onchange="setProduct('${slot}','per',this.value)">
+                                <span>Litern</span>
+                            </div>
+                            <div class="rec-meta">Beispiel: „1 ml ${dir === 'up' ? 'erhöht' : 'senkt'} ${cfg.label} um 0,1 ${cfg.unit} in 100 Litern“. Deine Angaben stehen auf der Verpackung.</div>
+                        </details>
                     </details>`;
                 });
             });
