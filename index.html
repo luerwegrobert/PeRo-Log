@@ -3783,10 +3783,10 @@
         function stepVal(id, dir, step) {
             const el = document.getElementById(id); if (!el) return;
             const cur = parseFloat(String(el.value).replace(',', '.')) || 0;
-            el.value = String(Math.max(0, Math.round((cur + dir * step) * 100) / 100)); el.focus({ preventScroll: true });
+            el.value = String(Math.max(0, Math.round((cur + dir * step) * 100) / 100));
         }
         function stepperHtml(id, p, ph, val, onEnter) {
-            const u = escapeHtml(p.unit || 'ml'), st = (p.unit === 'Tropfen' || p.unit === 'Tabletten') ? 1 : 0.5;
+            const u = escapeHtml(p.unit || 'ml'), st = (p.unit === 'Tropfen' || p.unit === 'Tabletten') ? 1 : 0.1;
             return `<div class="stepper"><button type="button" onclick="stepVal('${id}',-1,${st})" aria-label="weniger">−</button><div class="st-mid"><input type="number" step="any" inputmode="decimal" id="${id}" placeholder="0" aria-label="${ph}" value="${val}" ${onEnter ? `onkeydown="if(event.key==='Enter'){event.preventDefault();${onEnter}}"` : ''}><span>${u}</span></div><button type="button" onclick="stepVal('${id}',1,${st})" aria-label="mehr">+</button></div>`;
         }
         function doseBlockHtml(slot, p) {

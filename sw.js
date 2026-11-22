@@ -1,6 +1,6 @@
 // Service Worker: macht PeRo Log offline nutzbar.
-// Bei Änderungen an der App die Versionsnummer erhöhen (z. B. pero-log-v11).
-const CACHE = 'pero-log-v11';
+// Bei Änderungen an der App die Versionsnummer erhöhen (z. B. pero-log-v12).
+const CACHE = 'pero-log-v12';
 const FILES = ['./', 'index.html', 'manifest.webmanifest', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png', 'pdf.min.mjs', 'pdf.worker.min.mjs'];
 
 self.addEventListener('install', event => {
