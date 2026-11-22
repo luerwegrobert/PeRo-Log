@@ -1083,6 +1083,26 @@
         .step .stepper > button { width: 44px; font-size: 1.4rem; border-radius: 12px; } .step .stepper { gap: 8px; } .step .st-mid input { font-size: 1.3rem; } .step .st-mid { padding-top: 0; padding-bottom: 0; } .step .btn-note.big { padding: 11px; font-size: 1rem; margin-top: 8px; }
         .gt-row { grid-template-columns: 1.15fr 1fr 1fr; } .gt-v input { width: 100%; flex: 1 1 auto; }
         .gt-l em { font-style: normal; text-transform: none; letter-spacing: 0; opacity: .8; }
+
+        /* Messen: Wert-Kacheln im Neon-Design */
+        #valueFields .form-row-grid { gap: 10px; margin-bottom: 10px; }
+        #valueFields .vt { margin: 0; padding: 10px 11px 11px; border-radius: 16px; background: linear-gradient(160deg, rgba(92,201,222,0.09), rgba(92,201,222,0.02)); border: 1px solid rgba(92,201,222,0.22); box-shadow: 0 0 18px rgba(92,201,222,0.06), inset 0 1px 0 rgba(255,255,255,0.04); min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+        #valueFields .vt-l { display: flex; align-items: center; gap: 7px; margin: 0; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.02em; color: #effbff !important; }
+        #valueFields .vt-l i { width: 8px; height: 8px; border-radius: 50%; background: var(--vc); box-shadow: 0 0 8px var(--vc); flex: none; }
+        #valueFields .meth-sel { order: 1; margin: 0; padding: 6px 8px; min-height: 0; font-size: 16px; border-radius: 10px; background: rgba(92,201,222,0.07); border: 1px solid rgba(92,201,222,0.28); color: #bfeaf3; }
+        #valueFields .vt-in { order: 2; margin: 0; font-size: 1.35rem; font-weight: 700; padding: 8px 10px; border-radius: 12px; background: rgba(2,10,16,0.7); border: 1px solid rgba(92,201,222,0.3); }
+        #valueFields .vt-in::placeholder { font-weight: 500; font-size: 1rem; opacity: .45; }
+        #valueFields .vt .val-prev { order: 3; margin: 0; font-size: 0.72rem; min-height: 0; color: #5cc9de; }
+        #valueFields .vt .val-prev:empty { display: none; }
+        #valueFields .vt .input-styled { width: 100%; box-sizing: border-box; }
+        #input .form-row-grid > .form-group { min-width: 0; }
+        #testDate, #testTime { width: 100%; max-width: 100%; box-sizing: border-box; min-width: 0; -webkit-appearance: none; appearance: none; text-align: left; padding: 10px 12px; border-radius: 12px; background: rgba(92,201,222,0.07); border: 1px solid rgba(92,201,222,0.28); }
+        #valueFields .form-row-grid { align-items: start; gap: 8px; margin-bottom: 8px; }
+        #valueFields .vt { padding: 8px 9px 9px; gap: 5px; border-radius: 14px; }
+        #valueFields .meth-sel { font-size: 13px; padding: 5px 6px; text-overflow: ellipsis; }
+        #valueFields .vt-in { font-size: 1.2rem; padding: 6px 10px; }
+        #valueFields .vt-in::-webkit-inner-spin-button, #valueFields .vt-in::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; } #valueFields .vt-in { -moz-appearance: textfield; }
+        #valueFields .vt-l { font-size: 0.74rem; }
 </style>
 </head>
 <body>
@@ -1842,10 +1862,10 @@
                 const opts = METHODS[k].map(x => `<option value="${x.id}"${x.id === m.id ? ' selected' : ''}>${x.label}</option>`).join('');
                 const ph = heim && m.ph ? m.ph : { kh: 'z. B. 7,5', sal: 'z. B. 35', ca: 'z. B. 420', mg: 'z. B. 1350', no3: 'z. B. 5', po4: 'z. B. 0,04', temp: 'z. B. 25', ph: 'z. B. 8,2' }[k];
                 const lbl = `${cfg.label}${cfg.unit ? ' (' + cfg.unit + ')' : ''}`;
-                return `<div class="form-group">
-                    <label style="color:var(--color-${k})">${lbl}</label>
-                    <input type="number" step="any" inputmode="decimal" id="val_${k}" class="input-styled" placeholder="${ph}" value="${keep[k] ? keep[k].raw : ''}" oninput="onRawInput('${k}')">
+                return `<div class="form-group vt">
+                    <label class="vt-l" style="--vc:var(--color-${k})"><i></i>${lbl}</label>
                     ${heim ? `<select id="meth_${k}" class="input-styled meth-sel" onchange="onMethodChange('${k}')" aria-label="Messmethode ${cfg.label}">${opts}</select>` : ''}
+                    <input type="number" step="any" inputmode="decimal" id="val_${k}" class="input-styled vt-in" placeholder="${ph}" value="${keep[k] ? keep[k].raw : ''}" oninput="onRawInput('${k}')">
                     ${(heim && m.conv === 'denst') ? `<input type="number" step="any" inputmode="decimal" id="saltemp" class="input-styled" style="margin-top:6px;" placeholder="Wassertemperatur °C (leer = Temperaturfeld/25)" value="${keep.saltemp || ''}" oninput="onRawInput('sal')">` : ''}
                     <div class="val-prev" id="prev_${k}"></div>
                 </div>`;
