@@ -1542,7 +1542,7 @@
             c.style.display = doseSeg === 'chart' ? '' : 'none'; p.style.display = doseSeg === 'prod' ? '' : 'none';
             document.querySelectorAll('#doseSeg button').forEach(b => b.classList.toggle('active', b.dataset.seg === doseSeg));
         }
-        function setDoseSeg(n) { doseSeg = n; applyDoseSeg(); if (n === 'chart') renderDoseChart(); else renderProductSettings(); window.scrollTo({ top: 0 }); }
+        function setDoseSeg(n) { if (typeof prodEdit !== 'undefined' && prodEdit) { prodEdit = null; prodChg = null; } doseSeg = n; applyDoseSeg(); if (n === 'chart') renderDoseChart(); else renderProductSettings(); window.scrollTo({ top: 0 }); }
         // Beckengesundheit: Gesamtwert aus den neuesten Messwerten (optimal = 100 %, Warnung = 55 %, kritisch = 0 %)
         // ===== Bewertung: stufenlos, mit Gewichtung und Obergrenzen =====
         const HW = { sal: 1.2, kh: 1.5, ca: 1, mg: 1, no3: 0.8, po4: 0.8, temp: 1.2, ph: 1.2 };
@@ -3887,7 +3887,7 @@
                 let v = null, text = '';
                 if (ssr.bars) {
                     const q = ssr.pts.reduce((b, z) => (!b || Math.abs(z.ts - sel.ts) < Math.abs(b.ts - sel.ts)) ? z : b, null);
-                    if (q) { v = q.v; text = `${doseLabel(ssr.k)}: ${fmtNum(q.v)} ${doseUnit(ssr.k)} Einmal-Gabe`; sel.ts = q.ts; d0.setTime(q.ts); }
+                    if (q) { v = q.v; text = ssr.k === 'sal' && q.k1 !== undefined ? `${doseLabel(ssr.k)}: #1 ${fmtNum(Math.round(q.k1))} ml + #2 ${fmtNum(Math.round(q.k2))} ml` : ssr.k === 'sal_down' ? `${doseLabel(ssr.k)}: ${fmtNum(q.v)} ml Osmose Einmalgabe` : `${doseLabel(ssr.k)}: ${fmtNum(q.v)} ${doseUnit(ssr.k)} Einmal-Gabe`; sel.ts = q.ts; d0.setTime(q.ts); }
                 } else {
                     const e = doseValueAt(ssr.k, sel.ts);
                     if (e && e.v > 0) { const sd = new Date(e.eff); v = e.v; text = `${doseLabel(ssr.k)}: ${fmtNum(e.v)} ${doseUnit(ssr.k)} pro Tag (seit ${pad2(sd.getDate())}.${pad2(sd.getMonth() + 1)}.)`; }
