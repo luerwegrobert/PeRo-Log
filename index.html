@@ -1071,6 +1071,16 @@
         .gt-res .calc-res { flex: 1; min-width: 0; }
         .gt input[type=number]::-webkit-inner-spin-button, .gt input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; } .gt input[type=number] { -moz-appearance: textfield; }
         .gt input[type=date] { font-size: 15px; }
+
+        .pd-sum { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-top: 10px; padding-bottom: 10px; }
+        .pd-sum-t { min-width: 0; display: flex; flex-direction: column; } .pd-sum-t b { font-size: 0.95rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .pd-sum-t small { color: var(--text-muted); font-size: 0.75rem; }
+        .gt-row { grid-template-columns: 1.3fr 1fr 1fr; gap: 6px; margin: 8px 0 6px; }
+        .gt { padding: 6px 9px; gap: 2px; border-radius: 12px; }
+        .gt input { font-size: 15px; } .gt input[type=date] { font-size: 13px; }
+        .gt-v input { flex: 1 1 0; width: 0; min-width: 0; } .gt-v i { flex: none; }
+        .gt-res { padding: 6px 10px; margin-bottom: 8px; border-radius: 12px; font-size: 0.8rem; }
+        .gt-res .btn-note { padding: 6px 12px; font-size: 0.8rem; }
+        .step .stepper > button { width: 44px; font-size: 1.4rem; border-radius: 12px; } .step .stepper { gap: 8px; } .step .st-mid input { font-size: 1.3rem; } .step .st-mid { padding-top: 0; padding-bottom: 0; } .step .btn-note.big { padding: 11px; font-size: 1rem; margin-top: 8px; }
 </style>
 </head>
 <body>
@@ -1261,7 +1271,7 @@
         <div id="dosing" class="tab-content">
             <div class="seg" id="doseSeg">
                 <button type="button" data-seg="chart" class="active" onclick="setDoseSeg('chart')">Verlauf</button>
-                <button type="button" data-seg="prod" onclick="setDoseSeg('prod')">Produkte</button>
+                <button type="button" data-seg="prod" onclick="setDoseSeg('prod')">Dosierungen</button>
             </div>
             <div class="glass-panel" id="dosePanel">
                 <div style="font-weight: 700; margin-bottom: 12px;">📈 Dosierverlauf</div>
@@ -1286,8 +1296,8 @@
             </div>
 
             <div class="glass-panel" id="productSettings">
-                <h2 style="font-size:1.1rem; margin-bottom:10px;">Produkte &amp; Dosierung</h2>
-                <div class="rec-meta" id="prodIntro" style="margin:-4px 0 12px;">Tippe ein Produkt an: Produkt eingeben → Dosierung speichern.</div>
+                <h2 style="font-size:1.1rem; margin-bottom:10px;">Dosierungen</h2>
+                <div class="rec-meta" id="prodIntro" style="margin:-4px 0 12px;">Wähle einen Wert: Tagesdosis oder einzelne Gabe festlegen.</div>
                 <div id="productRows"></div>
             </div>
         </div>
@@ -1596,7 +1606,7 @@
                 const wc = V > 0 ? [10, 20, 30].map(p => saltChip(V * p / 100, `${p} % (${fmtNum(Math.round(V * p) / 100)} L)`)).join('') : '';
                 h += `<div class="rec-meta" style="margin:-4px 0 6px">Salzwasser für Neuansatz oder Wasserwechsel. Rezept: ${escapeHtml(saltCfg.name)}.</div>
                     <div class="dl">Schnellwahl</div><div class="chip-s-row">${saltChip(10, '10 L')}${saltChip(20, '20 L')}${saltChip(50, '50 L')}${wc}</div>
-                    ${V > 0 ? '' : '<div class="rec-meta">Tipp: Trage unter Dosieren → Produkte dein Nettovolumen ein, dann siehst du hier Wasserwechsel in Prozent.</div>'}
+                    ${V > 0 ? '' : '<div class="rec-meta">Tipp: Trage unter Dosieren → Dosierungen dein Nettovolumen ein, dann siehst du hier Wasserwechsel in Prozent.</div>'}
                     ${saltField('make', 'vol', 'Menge Salzwasser', 'L', 1)}${saltField('make', 'psu', 'Ziel-Salzgehalt', 'psu', 0.1)}
                     ${lv ? `<div class="chip-s-row" style="margin-top:8px"><button type="button" class="chip-s" onclick="saltMake.psu=${lv.v};renderSalt()">Beckenwert übernehmen (${fmtNum(lv.v)})</button></div>` : ''}`;
             } else {
@@ -1688,7 +1698,7 @@
         function renderHealth() {
             const box = document.getElementById('healthCard'); if (!box) return;
             if (!records.length) {
-                box.innerHTML = `<div class="welcome"><div class="w-t">Willkommen bei PeRo Log</div><div class="w-s">Dein Riff-Logbuch in drei Schritten:</div><ol><li><b>Messen</b> – trage deine erste Messung ein.</li><li><b>Dosieren</b> – richte deine Produkte und Dosierung ein (optional).</li><li><b>Tipps</b> – lies die Hinweise zu deinen Werten.</li></ol><button type="button" class="btn-submit" style="margin-top:12px;" onclick="navGo('input')">Erste Messung eintragen</button></div>`;
+                box.innerHTML = `<div class="welcome"><div class="w-t">Willkommen bei PeRo Log</div><div class="w-s">Dein Riff-Logbuch in drei Schritten:</div><ol><li><b>Messen</b> – trage deine erste Messung ein.</li><li><b>Dosieren</b> – richte deine Dosierungen ein (optional).</li><li><b>Tipps</b> – lies die Hinweise zu deinen Werten.</li></ol><button type="button" class="btn-submit" style="margin-top:12px;" onclick="navGo('input')">Erste Messung eintragen</button></div>`;
                 return;
             }
             box.innerHTML = '';
@@ -3880,7 +3890,7 @@
             document.getElementById('doseEmpty').style.display = series.length ? 'none' : 'flex';
             document.getElementById('doseHint').textContent = series.length
                 ? (doseLayoutMode(series) === 'lanes' ? 'Jeder Wert hat seine eigene Zeile mit eigener Skala (unter dem Namen steht der Wertebereich der Zeile, die Höhe ist darauf angepasst), damit nichts übereinander liegt. Tippe auf einen Punkt oder eine Linie für die echten Mengen.' : doseMode(series) === 'pct' ? 'Mehrere Werte mit unterschiedlichen Einheiten: jede Kurve ist auf ihren eigenen Höchstwert im Zeitraum bezogen (100 %). Tippe auf einen Punkt oder eine Linie für die echten Mengen.' : doseMode(series) === 'log' ? 'Die Mengen unterscheiden sich stark, deshalb ist die Achse logarithmisch (1 – 10 – 100 …). So bleiben kleine und große Mengen in ml lesbar. Tippe auf einen Punkt oder eine Linie für die genauen Werte.' : 'Tippe auf einen Punkt oder eine Linie für den genauen Wert, nochmal tippen schließt die Anzeige. Jede Änderung der Dosierung gilt sofort und erscheint gleich im Verlauf. Ohne Änderung bleibt die Dosierung unverändert.')
-                : 'Wechsle oben auf „Produkte“ und trage deine Tagesdosis oder Einmal-Gabe ein, dann entsteht hier dein Verlauf.';
+                : 'Wechsle oben auf „Dosierungen“ und trage deine Tagesdosis oder Einmal-Gabe ein, dann entsteht hier dein Verlauf.';
             doseLayout = series.length ? drawDoseChart(ctx, W, H, series, from, to, doseHover) : null;
         }
         let doseLayout = null;
@@ -3936,7 +3946,7 @@
             const tgt = e.target !== undefined ? e.target : (e.minOpt + e.maxOpt) / 2;
             const when = lv && lv.date ? String(lv.date).split('-').reverse().slice(0, 2).join('.') : '';
             return `<div class="gt-row">${dateT}
-                <label class="gt"><span class="gt-l">Ist${when ? ' · ' + when : ''}</span><span class="gt-v"><input type="number" step="any" inputmode="decimal" id="cc_${slot}" value="${lv ? r3(lv.v) : ''}" placeholder="–" aria-label="Ist-Wert" oninput="calcShow('${slot}')"><i>${cfg.unit}</i></span></label>
+                <label class="gt"><span class="gt-l">Ist</span><span class="gt-v"><input type="number" step="any" inputmode="decimal" id="cc_${slot}" value="${lv ? r3(lv.v) : ''}" placeholder="–" aria-label="Ist-Wert" oninput="calcShow('${slot}')"><i>${cfg.unit}</i></span></label>
                 <label class="gt"><span class="gt-l">Ziel</span><span class="gt-v"><input type="number" step="any" inputmode="decimal" id="ct_${slot}" value="${r3(tgt)}" placeholder="–" aria-label="Zielwert" oninput="calcShow('${slot}')"><i>${cfg.unit}</i></span></label></div>
                 <div class="gt-res"><div class="calc-res" id="cr_${slot}"></div><button type="button" class="btn-note save" onclick="calcApply('${slot}')">↓ Übernehmen</button></div>`;
         }
@@ -3945,7 +3955,7 @@
             const seg = `<div class="seg seg-s" role="group" aria-label="Dosierart"><button type="button" class="${once ? '' : 'active'}" onclick="setProduct('${slot}','mode','')">Täglich</button><button type="button" class="${once ? 'active' : ''}" onclick="setProduct('${slot}','mode','once')">Einzelne Gaben</button></div>`;
             if (once) {
                 const list = dosingLog.map((e, i) => ({ e, i })).filter(x => x.e.kind === 'once' && x.e.slot === slot).sort((a, b) => b.e.ts - a.e.ts).slice(0, 3).map(({ e, i }) => { const d = new Date(e.ts); return `<div class="gabe"><span>${pad2(d.getDate())}.${pad2(d.getMonth() + 1)}.${d.getFullYear()} · ${fmtNum(e.v)} ${u}</span><button type="button" class="thr-link" onclick="deleteGabe(${i})">löschen</button></div>`; }).join('');
-                return seg + gabeTiles(slot, p) + `<div class="dl">Menge der Gabe</div>${stepperHtml('ga_' + slot, p, 'Menge', '', `addGabe('${slot}')`)}<button type="button" class="btn-note save full big" onclick="addGabe('${slot}')">Gabe eintragen</button>${list ? '<div class="dl">Letzte Gaben</div>' + list : ''}`;
+                return seg + gabeTiles(slot, p) + `${stepperHtml('ga_' + slot, p, 'Menge', '', `addGabe('${slot}')`)}<button type="button" class="btn-note save full big" onclick="addGabe('${slot}')">Gabe eintragen</button>`;
             }
             return seg + `<div class="dl">Menge pro Tag</div>${stepperHtml('dd_' + slot, p, 'Tagesdosis', p.daily || '', `saveDaily('${slot}')`)}<button type="button" class="btn-note save full big" onclick="saveDaily('${slot}')">Tagesdosis speichern</button><details class="pb-mini"><summary>Früheren Tag nachtragen</summary><div class="dose-row wrap" style="margin-top:8px;"><input type="date" id="rd_${slot}" class="input-styled" value="${isoToday()}" aria-label="Datum"><input type="number" step="any" inputmode="decimal" id="rv_${slot}" class="input-styled" placeholder="Menge" aria-label="Menge"><span class="du">${u}</span><button type="button" class="btn-note save" onclick="addDailyFrom('${slot}')">Eintragen</button></div></details>`;
         }
@@ -4031,8 +4041,8 @@
             }
             return parts.length ? parts.join(' · ') : 'nicht eingerichtet';
         }
-        let prodEdit = null, calcOpen = false;
-        function openProd(slot) { prodEdit = slot; renderProductSettings(); window.scrollTo({ top: 0 }); }
+        let prodEdit = null, calcOpen = false, prodChg = null;
+        function openProd(slot) { prodEdit = slot; prodChg = null; renderProductSettings(); window.scrollTo({ top: 0 }); }
         function closeProd() { prodEdit = null; renderProductSettings(); window.scrollTo({ top: 0 }); }
         function renderProductSettings() {
             const root = document.getElementById('productRows'); if (!root) return;
@@ -4049,7 +4059,9 @@
                     h += `<div class="step"><div class="step-h">Dosierung</div>${doseBlockHtml(slot, p)}</div>`;
                 } else {
                     const hasD = hasDoseBlock(k, dir), vb = dir === 'up' ? 'erhöht' : 'senkt';
-                    h += `<div class="step"><div class="step-h">Produkt</div>
+                    const done = p.name && p.effect > 0 && prodChg !== slot;
+                    if (done) h += `<div class="step pd-sum"><div class="pd-sum-t"><b>${escapeHtml(p.name)}</b><small>${fmtNum(p.amount > 0 ? p.amount : 1)} ${escapeHtml(p.unit || 'ml')} ${dir === 'up' ? '+' : '−'}${fmtNum(p.effect)} ${cfg.unit} je ${fmtNum(p.per > 0 ? p.per : 100)} L</small></div><button type="button" class="btn-note" onclick="prodChg='${slot}';renderProductSettings()">Ändern</button></div>`;
+                    else h += `<div class="step"><div class="step-h">Produkt</div>
                         <input type="text" class="input-styled" placeholder="Produktname" aria-label="Produktname" value="${escapeHtml(p.name || '')}" onchange="setProduct('${slot}','name',this.value)">
                         <div class="dl">Wirkung laut Etikett (${vb} ${cfg.label})</div>
                         <div class="eff-grid">
@@ -4058,7 +4070,7 @@
                             <label>um ${cfg.unit || 'Wirkung'}<input type="number" step="any" inputmode="decimal" class="input-styled" placeholder="${cfg.unit === 'psu' ? '1' : '0,1'}" value="${p.effect || ''}" onchange="setProduct('${slot}','effect',this.value)"></label>
                             <label>in Litern<input type="number" step="any" inputmode="decimal" class="input-styled" placeholder="100" value="${p.per || ''}" onchange="setProduct('${slot}','per',this.value)"></label>
                         </div>
-                        <button type="button" class="btn-note save full" onclick="if(document.activeElement)document.activeElement.blur();showToast('Produkt gespeichert ✓')">Produkt speichern</button></div>`;
+                        <button type="button" class="btn-note save full" onclick="if(document.activeElement)document.activeElement.blur();prodChg=null;renderProductSettings();showToast('Produkt gespeichert ✓')">Produkt speichern</button></div>`;
                     if (hasD) h += `<div class="step"><div class="step-h">Dosierung</div>${doseBlockHtml(slot, p)}</div>`;
                     if (!hasD) h += `<details class="calc-det"${calcOpen ? ' open' : ''} ontoggle="calcOpen=this.open"><summary>Menge berechnen</summary>${calcHtml(slot, k, dir, p)}</details>`;
                 }
@@ -4068,7 +4080,7 @@
             }
             if (intro) intro.style.display = '';
             let h = `<div class="rem-row"><label>Nettovolumen</label><input type="number" min="1" inputmode="decimal" class="input-styled" style="width:110px;" placeholder="z. B. 400" value="${appSettings.volume || ''}" onchange="setVolume(this.value)"><span>Liter</span></div>
-                <div class="rec-meta" style="margin-bottom:14px;">Wassermenge im System ohne Gestein und Sand (Becken plus Technikbecken).</div><div class="pb-h">Produkt auswählen</div><div class="plist">`;
+                <div class="rec-meta" style="margin-bottom:14px;">Wassermenge im System ohne Gestein und Sand (Becken plus Technikbecken).</div><div class="pb-h">Was möchtest du dosieren?</div><div class="plist">`;
             const row = (slot, label, color, sub, setUp) => `<button type="button" class="prow" style="--dc:${color}" onclick="openProd('${slot}')"><span class="pr-dot" style="background:${color}"></span><span class="pr-t"><b>${label}</b><small class="${setUp ? 'ok' : ''}">${sub}</small></span><span class="pr-go">›</span></button>`;
             const a = appSettings.products.aio_up || {};
             Object.keys(REC.slots).forEach(k => {
