@@ -1537,7 +1537,7 @@
         // ===== Salzwasser: ansetzen, Wasserwechsel, aufsalzen =====
         const SALT_DEF = { name: 'ATI Absolute Ocean', ro: 8800, k1: 600, k2: 600, psu: 35, mode: 'rule' };
         let saltCfg = Object.assign({}, SALT_DEF);
-        try { Object.assign(saltCfg, JSON.parse(localStorage.getItem('pero_salt') || '{}')); } catch (e) {}
+        
         let saltSeg = 'make', saltMake = { vol: 10, psu: null }, saltTop = { vol: null, cur: null, tgt: null };
         function openSalt() { try { closeDetail(); } catch (e) {} resetViews(); switchTab('salt'); window.scrollTo({ top: 0 }); }
         function saltTotalL() { return (saltCfg.ro + saltCfg.k1 + saltCfg.k2) / 1000; }
@@ -1588,14 +1588,7 @@
                 h += `<div class="rec-meta" style="margin:-4px 0 6px">Wie viel Konzentrat fehlt, damit dein Becken den Zielwert erreicht? Bei zu hohem Wert siehst du, wie viel Wasser du ersetzt.</div>
                     ${saltField('top', 'vol', 'Beckenvolumen (Netto)', 'L', 10)}${saltField('top', 'cur', 'Aktueller Salzgehalt', 'psu', 0.1)}${saltField('top', 'tgt', 'Ziel-Salzgehalt', 'psu', 0.1)}`;
             }
-            h += `<details class="calc-det" style="margin-top:14px"><summary>Rezept anpassen</summary>
-                    <div class="rec-meta">Mengen für ${fmtNum(saltTotalL())} L fertiges Salzwasser bei ${fmtNum(saltCfg.psu)} psu. Voreingestellt: ATI Absolute Ocean.</div>
-                    <div class="dl">Berechnung beim Aufsalzen</div><div class="seg seg-s"><button type="button" class="${saltCfg.mode !== 'exact' ? 'active' : ''}" onclick="saltCfg.mode='rule';saltPersist();renderSalt()">Faustformel</button><button type="button" class="${saltCfg.mode === 'exact' ? 'active' : ''}" onclick="saltCfg.mode='exact';saltPersist();renderSalt()">Genau</button></div><div class="rec-meta">Faustformel: ${fmtNum(Math.round(saltCfg.k1 / Lr0 / saltCfg.psu * 1000) / 1000)} ml je Komponente pro Liter und +1 psu. „Genau“ rechnet die Verdünnung ein und liefert etwa 10 % mehr.</div>
-                    <div class="dl">Name</div><input type="text" class="input-styled" id="sc_name" value="${escapeHtml(saltCfg.name)}">
-                    <div class="eff-grid" style="margin-top:8px"><label>Osmose ml<input type="number" inputmode="decimal" class="input-styled" id="sc_ro" value="${saltCfg.ro}"></label><label>Konz. 1 ml<input type="number" inputmode="decimal" class="input-styled" id="sc_k1" value="${saltCfg.k1}"></label><label>Konz. 2 ml<input type="number" inputmode="decimal" class="input-styled" id="sc_k2" value="${saltCfg.k2}"></label><label>psu<input type="number" inputmode="decimal" class="input-styled" id="sc_psu" value="${saltCfg.psu}"></label></div>
-                    <button type="button" class="btn-note save full" onclick="saltSave()">Rezept speichern</button>
-                    <button type="button" class="thr-link" style="margin-top:8px" onclick="saltReset()">Auf Absolute Ocean zurücksetzen</button>
-                </details>`;
+            
             box.innerHTML = h;
             renderSaltRes();
         }
