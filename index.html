@@ -806,6 +806,38 @@
         .health-lines .d { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 7px; }
         .health-more { margin-top: 6px; font-size: 0.74rem; color: var(--color-sal); font-weight: 600; }
 
+
+        /* ===== Messen kompakt ===== */
+        #input .form-container { padding: 12px 14px 0; }
+        #input .type-toggle-container { margin-bottom: 10px; }
+        #input .type-toggle { padding: 8px 4px; font-size: 0.82rem; }
+        #input .form-group { margin-bottom: 8px; }
+        #input .form-group label { font-size: 0.72rem; margin-bottom: 3px; }
+        #input .input-styled { padding: 8px 10px; min-height: 0; font-size: 1rem; }
+        #input .form-row-grid { gap: 10px; margin-bottom: 0; }
+        #input .meth-sel { margin-top: 4px; padding: 4px 8px; font-size: 0.72rem; color: var(--text-muted); border-radius: 10px; }
+        #input .val-prev { font-size: 0.68rem; margin-top: 2px; }
+        .note-det { margin: 2px 0 8px; font-size: 0.82rem; } .note-det > summary { cursor: pointer; color: var(--text-muted); padding: 6px 0; } .note-det textarea { margin-top: 6px; }
+        .save-bar { position: sticky; bottom: calc(76px + env(safe-area-inset-bottom, 0px)); z-index: 5; margin: 0 -14px; padding: 10px 14px 12px; background: linear-gradient(180deg, rgba(5,10,16,0), rgba(5,10,16,0.95) 35%); }
+        .save-bar .btn-submit { margin: 0; width: 100%; }
+        /* ===== Kachel Mini-Graph ===== */
+        .tile { min-height: 124px; }
+        .tile-u { white-space: nowrap; }
+        .spark { width: 100%; height: 22px; margin-top: 6px; color: var(--sc); display: block; }
+        /* ===== Produkte: Liste und Detail ===== */
+        .plist { display: grid; gap: 8px; }
+        .prow { display: flex; align-items: center; gap: 12px; width: 100%; padding: 13px 14px; border-radius: 14px; background: rgba(255,255,255,0.035); border: 1px solid rgba(255,255,255,0.08); color: inherit; font-family: inherit; text-align: left; cursor: pointer; }
+        .prow:active { transform: scale(0.985); }
+        .pr-dot { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+        .pr-t { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+        .pr-t b { font-size: 0.95rem; } .pr-t small { font-size: 0.76rem; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .pr-t small.ok { color: var(--status-green); }
+        .pr-go { color: var(--text-muted); font-size: 1.4rem; }
+        .back-btn { background: none; border: 0; color: var(--color-sal); font-family: inherit; font-size: 0.95rem; font-weight: 600; padding: 4px 0 10px; cursor: pointer; }
+        .pd-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 14px; }
+        .step { margin-bottom: 14px; padding: 14px; border-radius: 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); }
+        .step-h { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 0.98rem; margin-bottom: 6px; }
+        .step-h b { width: 24px; height: 24px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 0.78rem; color: var(--color-sal); border: 1px solid rgba(92,201,222,0.55); flex: none; }
+        .step-h small { font-weight: 400; color: var(--text-muted); font-size: 0.74rem; }
         /* ===== Werte rund um den Ring ===== */
         .hub { display: grid; grid-template-columns: 1fr 1.15fr 1fr; gap: 8px; margin-bottom: 4px; }
         .tile { position: relative; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 1px; min-height: 100px; min-width: 0; padding: 10px 10px 9px 13px; border-radius: 16px; background: rgba(255, 255, 255, 0.035); border: 1px solid rgba(255, 255, 255, 0.08); color: inherit; font-family: inherit; text-align: left; cursor: pointer; overflow: hidden; transition: transform .15s; }
@@ -1128,14 +1160,14 @@
 
             <div class="glass-panel" id="productSettings">
                 <h2 style="font-size:1.1rem; margin-bottom:10px;">Produkte &amp; Dosierung</h2>
-                <div class="how"><div><b>1</b><span>Nettovolumen eintragen</span></div><div><b>2</b><span>Wert öffnen, bei „Produkt einrichten“ die Etikett-Angaben eintragen</span></div><div><b>3</b><span>Bei „Dosierung“ deine Tagesdosis speichern. Der Verlauf erscheint oben unter „Verlauf“.</span></div></div>
+                <div class="how" id="prodIntro"><div><b>1</b><span>Nettovolumen eintragen</span></div><div><b>2</b><span>Produkt antippen und Etikett-Angaben eintragen</span></div><div><b>3</b><span>Tagesdosis festlegen und speichern</span></div></div>
                 <div id="productRows"></div>
             </div>
         </div>
 
         <!-- INPUT TAB -->
         <div id="input" class="tab-content">
-            <div id="timerBox"></div>
+            <div id="timerBox" style="display:none"></div>
             <div class="glass-panel form-container">
                 <div class="type-toggle-container">
                     <div id="toggleHome" class="type-toggle active" onclick="setRecordType('Heimtest')">🏠 Heim-Wassertest</div>
@@ -1145,7 +1177,7 @@
                 <form id="waterTestForm" onsubmit="saveRecord(event)">
                     <div class="form-row-grid">
                         <div class="form-group">
-                            <label for="testDate">Messdatum</label>
+                            <label for="testDate">Datum</label>
                             <input type="date" id="testDate" class="input-styled" required>
                         </div>
                         <div class="form-group">
@@ -1153,7 +1185,7 @@
                             <input type="time" id="testTime" class="input-styled">
                         </div>
                     </div>
-                    <div style="font-size: 0.75rem; color: var(--text-muted); margin: -6px 0 12px;">Mehrere Messungen am selben Tag? Einfach erneut mit anderer Uhrzeit eintragen.</div>
+                    
 
                     <div class="form-group" id="procedureGroup" style="display:none;">
                             <label id="procedureLabel" for="testProcedure">Testverfahren</label>
@@ -1177,15 +1209,14 @@
                         </div>
                     </div>
 
-                    <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 12px; margin-top: 5px;"></div>
                     <div id="valueFields"></div>
 
-                    <div class="form-group">
-                        <label for="testNote">📝 Notiz / Tagebuch (optional)</label>
-                        <textarea id="testNote" class="input-styled" rows="3" placeholder="z.B. 10 % Wasserwechsel, neue Koralle eingesetzt, Skimmer gereinigt …"></textarea>
-                    </div>
+                    <details class="note-det">
+                        <summary>📝 Notiz hinzufügen (optional)</summary>
+                        <textarea id="testNote" class="input-styled" rows="3" placeholder="z.B. 10 % Wasserwechsel, neue Koralle eingesetzt …"></textarea>
+                    </details>
 
-                    <button type="submit" class="btn-submit">💾 Werte sicher dokumentieren</button>
+                    <div class="save-bar"><button type="submit" class="btn-submit">💾 Messung speichern</button></div>
                 </form>
             </div>
         </div>
@@ -1481,8 +1512,8 @@
                 const lbl = `${cfg.label}${cfg.unit ? ' (' + cfg.unit + ')' : ''}`;
                 return `<div class="form-group">
                     <label style="color:var(--color-${k})">${lbl}</label>
-                    ${heim ? `<select id="meth_${k}" class="input-styled meth-sel" onchange="onMethodChange('${k}')">${opts}</select>` : ''}
                     <input type="number" step="any" inputmode="decimal" id="val_${k}" class="input-styled" placeholder="${ph}" value="${keep[k] ? keep[k].raw : ''}" oninput="onRawInput('${k}')">
+                    ${heim ? `<select id="meth_${k}" class="input-styled meth-sel" onchange="onMethodChange('${k}')" aria-label="Messmethode ${cfg.label}">${opts}</select>` : ''}
                     ${(heim && m.conv === 'denst') ? `<input type="number" step="any" inputmode="decimal" id="saltemp" class="input-styled" style="margin-top:6px;" placeholder="Wassertemperatur °C (leer = Temperaturfeld/25)" value="${keep.saltemp || ''}" oninput="onRawInput('sal')">` : ''}
                     <div class="val-prev" id="prev_${k}"></div>
                 </div>`;
@@ -1890,6 +1921,18 @@
                 <path d="M${last[0].toFixed(2)} ${last[1].toFixed(2)} h0.01" stroke="${color}" stroke-width="7" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
             </svg><div class="spark-cap" style="color:${color};font-weight:600;">${trend}</div><div class="spark-cap">${detail}</div></div>`;
         }
+        function sparkHtml(k) {
+            const pts = [];
+            records.forEach(r => { if (r.values && r.values[k] !== null && r.values[k] !== undefined && r.values[k] !== '') { const v = parseFloat(r.values[k]), t = recTs(r); if (!isNaN(v) && !isNaN(t)) pts.push({ t, v }); } });
+            pts.sort((a, b) => a.t - b.t);
+            const p = pts.slice(-10);
+            if (!p.length) return '<svg class="spark" viewBox="0 0 100 24" aria-hidden="true"></svg>';
+            const W = 100, H = 24, pad = 3, lo = Math.min(...p.map(x => x.v)), hi = Math.max(...p.map(x => x.v)), rg = hi - lo || 1;
+            const xy = (x, i) => [p.length === 1 ? W / 2 : pad + (W - 2 * pad) * i / (p.length - 1), H - pad - (H - 2 * pad) * (x.v - lo) / rg];
+            const c = p.map(xy), last = c[c.length - 1];
+            const line = p.length > 1 ? `<polyline points="${c.map(a => a[0].toFixed(1) + ',' + a[1].toFixed(1)).join(' ')}" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" opacity=".75"/>` : '';
+            return `<svg class="spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true">${line}<circle cx="${last[0].toFixed(1)}" cy="${last[1].toFixed(1)}" r="2.6" fill="currentColor"/></svg>`;
+        }
         function renderDashboard() {
             const grid = document.getElementById('dashboardValues'); if (!grid) return;
             const keys = Object.keys(thresholds), h = healthSummary(), cells = [];
@@ -1898,7 +1941,8 @@
                 const st = lv ? getStatusColorClass(k, String(lv.v)) : null;
                 const cls = !st ? 'none' : st.label === 'Optimal' ? 'ok' : st.label === 'Warnung' ? 'warn' : 'crit';
                 const val = lv ? String(lv.v) : '–', stl = st ? st.label : 'Keine Daten';
-                cells.push(`<button type="button" class="tile ${cls}" onclick="openDetail('${k}')" aria-label="${escapeHtml(cfg.label)}: ${val} ${escapeHtml(cfg.unit || '')}, ${stl}"><span class="tile-n">${escapeHtml(cfg.label)}</span><span class="tile-v">${val}</span><span class="tile-u">${escapeHtml(cfg.unit || '\u00a0')}</span><span class="tile-s"><i></i>${stl}</span></button>`);
+                const dt = lv ? pad2(new Date(lv.ts).getDate()) + '.' + pad2(new Date(lv.ts).getMonth() + 1) + '.' : '';
+                cells.push(`<button type="button" class="tile ${cls}" onclick="openDetail('${k}')" aria-label="${escapeHtml(cfg.label)}: ${val} ${escapeHtml(cfg.unit || '')}, ${stl}"><span class="tile-n">${escapeHtml(cfg.label)}</span><span class="tile-v">${val}</span><span class="tile-u">${escapeHtml(cfg.unit || '\u00a0')}${dt ? ' · ' + dt : ''}</span>${sparkHtml(k)}<span class="tile-s"><i></i>${stl}</span></button>`);
             });
             cells.splice(Math.min(4, cells.length), 0, healthRingHtml(h));
             grid.innerHTML = cells.join('');
@@ -3641,53 +3685,58 @@
             }
             return parts.length ? parts.join(' · ') : 'nicht eingerichtet';
         }
+        let prodEdit = null;
+        function openProd(slot) { prodEdit = slot; renderProductSettings(); window.scrollTo({ top: 0 }); }
+        function closeProd() { prodEdit = null; renderProductSettings(); window.scrollTo({ top: 0 }); }
         function renderProductSettings() {
-            let html = `<div class="rem-row"><label>Nettovolumen</label><input type="number" min="1" inputmode="decimal" class="input-styled" style="width:110px;" placeholder="z. B. 400" value="${appSettings.volume || ''}" onchange="setVolume(this.value)"><span>Liter</span></div>
-                <div style="font-size:0.75rem; color:var(--text-muted);">Wassermenge im System ohne Gestein und Sand (Becken plus Technikbecken).</div>`;
-            let aioHtml = '';
-            {
-                const a = appSettings.products.aio_up || {}, units = ['ml', 'g', 'Tropfen', 'Tabletten'];
-                aioHtml = `<details class="prod-block prod-acc"${prodOpen.has('aio_up') ? ' open' : ''} ontoggle="prodToggle('aio_up',this.open)">
-                    <summary class="prod-title" style="color:${paramColors.aio}">🧪 All4Reef (A4R)<span class="prod-sum">${prodSummary('aio_up', a)}</span></summary>
-                    ${doseBlockHtml('aio_up', a)}
-                </details>`;
+            const root = document.getElementById('productRows'); if (!root) return;
+            const intro = document.getElementById('prodIntro');
+            const units = ['ml', 'g', 'Tropfen', 'Tabletten'];
+            if (prodEdit) {
+                if (intro) intro.style.display = 'none';
+                const slot = prodEdit, isAio = slot === 'aio_up', k = isAio ? 'aio' : slot.split('_')[0], dir = slot.endsWith('_down') ? 'down' : 'up';
+                const p = appSettings.products[slot] || {}, cfg = thresholds[k] || { label: 'All4Reef', unit: '' };
+                const title = isAio ? '🧪 All4Reef (A4R)' : `${cfg.label} · ${dir === 'up' ? '⬆️ erhöhen' : '⬇️ senken'}`;
+                let h = `<button type="button" class="back-btn" onclick="closeProd()">‹ Alle Produkte</button><div class="pd-title" style="color:${paramColors[k]}">${title}</div>`;
+                if (isAio) {
+                    h += `<div class="step"><div class="step-h"><b>1</b>Dosierung</div>${doseBlockHtml(slot, p)}</div>`;
+                } else {
+                    const hasD = hasDoseBlock(k, dir);
+                    h += `<div class="step"><div class="step-h"><b>1</b>Produkt eintragen</div>
+                        <div class="pb-lab">Name</div>
+                        <input type="text" class="input-styled" placeholder="z. B. Grotech Phosphat Plus" value="${escapeHtml(p.name || '')}" onchange="setProduct('${slot}','name',this.value)">
+                        <div class="pb-lab">Wirkung laut Etikett</div>
+                        <div class="prod-line">
+                            <input type="number" step="any" inputmode="decimal" class="input-styled" placeholder="1" value="${p.amount || ''}" onchange="setProduct('${slot}','amount',this.value)">
+                            <select class="input-styled" onchange="setProduct('${slot}','unit',this.value)">${units.map(u => `<option${(p.unit || 'ml') === u ? ' selected' : ''}>${u}</option>`).join('')}</select>
+                            <span>${dir === 'up' ? 'erhöht' : 'senkt'} ${cfg.label} um</span>
+                            <input type="number" step="any" inputmode="decimal" class="input-styled" placeholder="${cfg.unit === 'psu' ? '1' : '0,1'}" value="${p.effect || ''}" onchange="setProduct('${slot}','effect',this.value)">
+                            <span>${cfg.unit} in</span>
+                            <input type="number" step="any" inputmode="decimal" class="input-styled" placeholder="100" value="${p.per || ''}" onchange="setProduct('${slot}','per',this.value)">
+                            <span>Litern</span>
+                        </div>
+                        <div class="rec-meta">Beispiel: „1 ml ${dir === 'up' ? 'erhöht' : 'senkt'} ${cfg.label} um 0,1 ${cfg.unit} in 100 Litern“ – steht auf der Verpackung.</div></div>`;
+                    if (hasD) h += `<div class="step"><div class="step-h"><b>2</b>Dosierung festlegen</div>${doseBlockHtml(slot, p)}</div>`;
+                    h += `<div class="step"><div class="step-h"><b>${hasD ? 3 : 2}</b>Menge berechnen <small>optional</small></div>${calcHtml(slot, k, dir, p)}</div>`;
+                }
+                root.innerHTML = h;
+                root.querySelectorAll('[id^="cr_"]').forEach(el => calcShow(el.id.slice(3)));
+                return;
             }
+            if (intro) intro.style.display = '';
+            let h = `<div class="rem-row"><label>Nettovolumen</label><input type="number" min="1" inputmode="decimal" class="input-styled" style="width:110px;" placeholder="z. B. 400" value="${appSettings.volume || ''}" onchange="setVolume(this.value)"><span>Liter</span></div>
+                <div class="rec-meta" style="margin-bottom:14px;">Wassermenge im System ohne Gestein und Sand (Becken plus Technikbecken).</div><div class="pb-h">Produkt auswählen</div><div class="plist">`;
+            const row = (slot, label, color, sub, setUp) => `<button type="button" class="prow" onclick="openProd('${slot}')"><span class="pr-dot" style="background:${color}"></span><span class="pr-t"><b>${label}</b><small class="${setUp ? 'ok' : ''}">${sub}</small></span><span class="pr-go">›</span></button>`;
+            const a = appSettings.products.aio_up || {};
             Object.keys(REC.slots).forEach(k => {
                 REC.slots[k].forEach(dir => {
-                    const slot = k + '_' + dir;
-                    const p = appSettings.products[slot] || {};
-                    const cfg = thresholds[k];
-                    if (k === 'kh' && dir === 'up') html += aioHtml;
-                    if (dir === 'up' && p.aio) {
-                        html += `<div class="prod-block"><div class="prod-title" style="color:${paramColors[k]}">${cfg.label} · ⬆️ erhöhen</div><div class="rec-meta">Wird über dein All-in-One-Produkt „${escapeHtml(p.name)}“ dosiert (siehe oben).</div></div>`;
-                        return;
-                    }
-                    const units = ['ml', 'g', 'Tropfen', 'Tabletten'];
-                    const configured = !!(p.name && p.effect > 0), hasD = hasDoseBlock(k, dir);
-                    html += `<details class="prod-block prod-acc"${prodOpen.has(slot) ? ' open' : ''} ontoggle="prodToggle('${slot}',this.open)">
-                        <summary class="prod-title" style="color:${paramColors[k]}">${cfg.label} · ${dir === 'up' ? '⬆️ erhöhen' : '⬇️ senken'}<span class="prod-sum">${prodSummary(slot, p)}</span></summary>
-                        ${hasD ? `<div class="pb-sec"><div class="pb-h">Dosierung</div>${doseBlockHtml(slot, p)}</div>` : ''}
-                        <details class="pb-det"${subOpen(slot + ':calc', false)} ontoggle="subToggle('${slot}:calc',this.open)"><summary>Menge berechnen<span>Wie viel brauche ich?</span></summary>${calcHtml(slot, k, dir, p)}</details>
-                        <details class="pb-det"${subOpen(slot + ':setup', !configured)} ontoggle="subToggle('${slot}:setup',this.open)"><summary>Produkt einrichten<span>${configured ? escapeHtml(p.name) : 'Name und Wirkung eintragen'}</span></summary>
-                            <div class="pb-lab">Produktname</div>
-                            <input type="text" class="input-styled" placeholder="z. B. Grotech Phosphat Plus" value="${escapeHtml(p.name || '')}" onchange="setProduct('${slot}','name',this.value)">
-                            <div class="pb-lab">Wirkung laut Etikett</div>
-                            <div class="prod-line">
-                                <input type="number" step="any" inputmode="decimal" class="input-styled" placeholder="1" value="${p.amount || ''}" onchange="setProduct('${slot}','amount',this.value)">
-                                <select class="input-styled" onchange="setProduct('${slot}','unit',this.value)">${units.map(u => `<option${(p.unit || 'ml') === u ? ' selected' : ''}>${u}</option>`).join('')}</select>
-                                <span>${dir === 'up' ? 'erhöht' : 'senkt'} ${cfg.label} um</span>
-                                <input type="number" step="any" inputmode="decimal" class="input-styled" placeholder="${cfg.unit === 'psu' ? '1' : '0,1'}" value="${p.effect || ''}" onchange="setProduct('${slot}','effect',this.value)">
-                                <span>${cfg.unit} in</span>
-                                <input type="number" step="any" inputmode="decimal" class="input-styled" placeholder="100" value="${p.per || ''}" onchange="setProduct('${slot}','per',this.value)">
-                                <span>Litern</span>
-                            </div>
-                            <div class="rec-meta">Beispiel: „1 ml ${dir === 'up' ? 'erhöht' : 'senkt'} ${cfg.label} um 0,1 ${cfg.unit} in 100 Litern“. Deine Angaben stehen auf der Verpackung.</div>
-                        </details>
-                    </details>`;
+                    const slot = k + '_' + dir, p = appSettings.products[slot] || {}, cfg = thresholds[k];
+                    if (k === 'kh' && dir === 'up') h += row('aio_up', '🧪 All4Reef (A4R)', paramColors.aio, prodSummary('aio_up', a), a.daily > 0 || a.mode === 'once');
+                    if (dir === 'up' && p.aio) { h += row('aio_up', `${cfg.label} ⬆️ erhöhen`, paramColors[k], `über All-in-One „${escapeHtml(p.name)}“`, true); return; }
+                    h += row(slot, `${cfg.label} ${dir === 'up' ? '⬆️ erhöhen' : '⬇️ senken'}`, paramColors[k], prodSummary(slot, p), !!(p.name && p.effect > 0));
                 });
             });
-            document.getElementById('productRows').innerHTML = html;
-            document.querySelectorAll('#productRows [id^="cr_"]').forEach(el => calcShow(el.id.slice(3)));
+            root.innerHTML = h + '</div>';
         }
 
         // ===== PDF-Report (ohne Bibliothek, funktioniert auch als Home-Bildschirm-App) =====
