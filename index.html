@@ -1117,6 +1117,13 @@
         .tile .tile-n { color: var(--pc, #9fb3c0); text-shadow: none; }
         .tile { background-image: none; box-shadow: none; border-color: color-mix(in srgb, var(--pc, #5cc9de) 55%, transparent); }
         .tile.warn { border-color: rgba(230,198,119,0.7); } .tile.crit { border-color: rgba(239,107,122,0.8); }
+        .gt-row.two { grid-template-columns: 1fr 1fr; } .gt-row.two .gt b { word-break: break-word; }
+        .tile-i { display: block; margin-top: 2px; font-size: 0.66rem; font-weight: 600; color: var(--text-muted); white-space: nowrap; letter-spacing: 0; text-transform: none; }
+        .tile-s .tile-d { margin: 0 0 0 auto; display: inline; font-size: 0.68rem; }
+        .tile .spark { height: 20px; margin-top: 4px; }
+        .tile-i { font-size: 0.62rem; margin-top: 1px; }
+        .tile { min-height: 0; padding-top: 9px; padding-bottom: 8px; }
+        body { padding-bottom: calc(130px + env(safe-area-inset-bottom, 0px)) !important; }
 </style>
 </head>
 <body>
@@ -1399,10 +1406,10 @@
     <script>
         // Thresholds structure definitions
         const thresholds = {
-            sal: { minOpt: 34, maxOpt: 36, minTol: 33, maxTol: 37, label: "Salzgehalt", unit: "psu" },
+            sal: { minOpt: 34.5, maxOpt: 35.2, minTol: 33.5, maxTol: 36, label: "Salzgehalt", unit: "psu" },
             kh: { minOpt: 7.4, maxOpt: 8.3, minTol: 6.8, maxTol: 8.5, label: "KH", unit: "°dKH" },
             ca: { minOpt: 410, maxOpt: 435, minTol: 400, maxTol: 445, label: "Calcium", unit: "mg/l" },
-            mg: { minOpt: 1300, maxOpt: 1400, minTol: 1200, maxTol: 1500, label: "Magnesium", unit: "mg/l" },
+            mg: { minOpt: 1275, maxOpt: 1380, minTol: 1200, maxTol: 1450, label: "Magnesium", unit: "mg/l" },
             no3: { minOpt: 2, maxOpt: 15, minTol: 1, maxTol: 30, label: "Nitrat", unit: "mg/l" },
             po4: { minOpt: 0.02, maxOpt: 0.11, minTol: 0.01, maxTol: 0.15, label: "Phosphat", unit: "mg/l" },
             temp: { minOpt: 24.5, maxOpt: 25.5, minTol: 23.0, maxTol: 27.5, label: "Temperatur", unit: "°C" },
@@ -2135,6 +2142,18 @@
             detailMsg = `✅ ${thresholds[k].label} ${fmtNum(c.value)}${thresholds[k].unit ? ' ' + thresholds[k].unit : ''} eingetragen.`;
             persistRecords(); renderDetail();
         }
+        function detailInfoHtml(k) {
+            const cfg = thresholds[k], all = detailRows(k); if (!all.length) return '';
+            const u = cfg.unit ? ' ' + cfg.unit : '', e = effectiveThr(k), last = all[0];
+            const six = all.slice(0, 6), vs = six.map(r => parseFloat(r.values[k]));
+            const avg = vs.reduce((x, y) => x + y, 0) / vs.length, rd = x => fmtNum(Math.round(x * 1000) / 1000);
+            const fd = r => r.date.split('-').reverse().slice(0, 2).join('.') + '.';
+            let dl = '–';
+            if (all.length > 1) { const d = Math.round((vs[0] - parseFloat(all[1].values[k])) * 1000) / 1000; dl = (d > 0 ? '↗ +' : d < 0 ? '↘ −' : '→ ±') + rd(Math.abs(d)) + u; }
+            const m = last.methods && last.methods[k] ? last.methods[k] : (last.type === 'Heimtest' ? 'Heimtest' : (last.procedure || last.type || ''));
+            const t = (l, v) => `<div class="gt"><span class="gt-l">${l}</span><b style="font-size:0.95rem;color:#effbff;">${v}</b></div>`;
+            return `<div class="gt-row two" style="margin:0 0 12px;">${t('Soll', rd(e.minOpt) + '–' + rd(e.maxOpt) + u)}${t('Änderung zur letzten', dl)}${t('Ø ' + (six.length > 1 ? 'letzte ' + six.length : 'Wert'), rd(avg) + u)}${t('Verlauf', six.length > 1 ? fd(six[six.length - 1]) + '–' + fd(six[0]) : fd(six[0]))}${t('Gemessen', fd(last) + (last.time ? ' ' + last.time : ''))}${t('Methode', escapeHtml(m) || '–')}</div>`;
+        }
         function renderDetail() {
             const k = detailK; if (!k) return;
             const cfg = thresholds[k], lv = latestValue(k), col = paramColors[k];
@@ -2161,7 +2180,8 @@
                     <button type="button" class="btn-note" onclick="closeDetail()" aria-label="Schließen">✕ Schließen</button>
                 </div>
                 <div style="font-size:2rem;font-weight:800;color:${st ? st.color : '#fff'};">${lv ? fmtNum(lv.v) : '–'}<span style="font-size:1rem;color:var(--text-muted);">${unit}</span> ${st && st.label ? `<span class="status-badge ${st.badge}" style="vertical-align:middle;">${st.label}</span>` : ''}</div>
-                <div class="rec-meta" style="margin-bottom:12px;">Soll: ${fmtNum(e.minOpt)}–${fmtNum(e.maxOpt)}${unit}${lv ? ' · gemessen ' + lv.date.split('-').reverse().join('.') + (lv.time ? ' ' + lv.time : '') : ''}</div>
+<div style="height:12px"></div>
+                ${detailInfoHtml(k)}
                 <div class="detail-h">Neue Messung eintragen</div>
                 <div class="form-group"><select id="dn_m" class="input-styled meth-sel" onchange="detailNewMethod()">${METHODS[k].map(x => `<option value="${x.id}"${x.id === methodOf(k, methodMemory[k] || METHODS[k][0].id).id ? ' selected' : ''}>${x.label}</option>`).join('')}</select></div>
                 <div class="form-group"><input type="number" step="any" inputmode="decimal" id="dn_v" class="input-styled" placeholder="${methodOf(k, methodMemory[k] || METHODS[k][0].id).ph || DEF_PH[k]}" oninput="detailNewPrev()"><div id="dn_stw" style="display:${methodOf(k, methodMemory[k] || METHODS[k][0].id).conv === 'denst' ? 'block' : 'none'};margin-top:6px;"><input type="number" step="any" inputmode="decimal" id="dn_st" class="input-styled" placeholder="Wassertemperatur °C (leer = 25)" oninput="detailNewPrev()"></div><div class="val-prev" id="dn_p"></div></div>
@@ -2311,6 +2331,13 @@
             if (d === 0) return '<span class="tile-d flat" title="unverändert zur letzten Messung">→ 0</span>';
             return `<span class="tile-d ${d > 0 ? 'up' : 'dn'}" title="Änderung zur letzten Messung">${d > 0 ? '↗' : '↘'} ${d > 0 ? '+' : '−'}${fmtNum(Math.abs(d))}</span>`;
         }
+        function infoHtml(k, lv) {
+            const e = effectiveThr(k), rd = x => String(Math.round(x * 100) / 100).replace('.', ','), dec = lv ? Math.min(3, ((String(lv.v).split('.')[1]) || '').length) : 0, ra = x => String(Math.round(x * Math.pow(10, dec)) / Math.pow(10, dec)).replace('.', ',');
+            let h = `<span class="tile-i">Soll ${rd(e.minOpt)}–${rd(e.maxOpt)}</span>`;
+            const vs = detailRows(k).slice(0, 6).map(r => parseFloat(r.values[k]));
+            if (vs.length > 1) h += `<span class="tile-i">Ø ${ra(vs.reduce((a, b) => a + b, 0) / vs.length)}</span>`;
+            return h;
+        }
         function renderDashboard() {
             const grid = document.getElementById('dashboardValues'); if (!grid) return;
             const keys = Object.keys(thresholds), h = healthSummary(), cells = [];
@@ -2320,7 +2347,7 @@
                 const cls = !vs ? 'none' : vs.lvl === 0 ? 'ok' : vs.lvl === 1 ? 'warn' : 'crit';
                 const val = lv ? String(lv.v) : '–', stl = vs ? lvlLabel(vs.lvl) : 'Keine Daten';
                 const dt = lv ? pad2(new Date(lv.ts).getDate()) + '.' + pad2(new Date(lv.ts).getMonth() + 1) + '.' : '';
-                cells.push(`<button type="button" class="tile ${cls}" style="--pc:${paramColors[k] || ''}" onclick="openDetail('${k}')" aria-label="${escapeHtml(cfg.label)}: ${val} ${escapeHtml(cfg.unit || '')}, ${stl}"><span class="tile-n">${escapeHtml(cfg.label)}</span><span class="tile-v">${val}</span><span class="tile-u">${escapeHtml(cfg.unit || '\u00a0')}${dt ? ' · ' + dt : ''}</span>${sparkHtml(k)}<span class="tile-s"><i></i>${stl}</span>${deltaHtml(k, lv)}</button>`);
+                cells.push(`<button type="button" class="tile ${cls}" style="--pc:${paramColors[k] || ''}" onclick="openDetail('${k}')" aria-label="${escapeHtml(cfg.label)}: ${val} ${escapeHtml(cfg.unit || '')}, ${stl}"><span class="tile-n">${escapeHtml(cfg.label)}</span><span class="tile-v">${val}</span><span class="tile-u">${escapeHtml(cfg.unit || '\u00a0')}${dt ? ' · ' + dt : ''}</span>${sparkHtml(k)}<span class="tile-s"><i></i>${cls === 'ok' ? '' : stl}${deltaHtml(k, lv)}</span>${infoHtml(k, lv)}</button>`);
             });
             cells.splice(Math.min(4, cells.length), 0, healthRingHtml(h));
             grid.innerHTML = cells.join('');
@@ -2791,6 +2818,7 @@
         const DEFAULT_THR = JSON.parse(JSON.stringify(thresholds));
         const DEFAULT_TRIG = { low: Object.assign({}, REC.trigLow), high: Object.assign({}, REC.trigHigh), target: Object.assign({}, REC.target) };
         let userThr = (() => { try { const x = JSON.parse(localStorage.getItem('pepeaqua_thresholds')); return x && typeof x === 'object' ? x : {}; } catch (e) { return {}; } })();
+        (function () { let ch = false; Object.keys(userThr).forEach(k => { const u = userThr[k], d = thresholds[k]; if (!u || !d) return; ['minOpt', 'maxOpt'].forEach(f => { if (u[f] !== undefined && Number(u[f]) === d[f]) { delete u[f]; ch = true; } }); if (!Object.keys(u).length) { delete userThr[k]; ch = true; } }); if (ch) try { localStorage.setItem('pepeaqua_thresholds', JSON.stringify(userThr)); } catch (e) {} })();
         function saveThr() { try { localStorage.setItem('pepeaqua_thresholds', JSON.stringify(userThr)); } catch (e) {} }
         const r3 = x => Number(Number(x).toFixed(3));
 
