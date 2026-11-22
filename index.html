@@ -2140,7 +2140,7 @@
                 <button type="button" class="thr-link" onclick="detailGo('targets')">Alle Sollwerte öffnen →</button>
                 <div class="detail-h">Dosierung</div>${prods || '<div class="rec-meta">Noch kein Produkt hinterlegt.</div>'}
                 <button type="button" class="thr-link" onclick="detailGo('dosing')">Dosierungen öffnen →</button>
-                ${detailK === 'sal' ? '<button type="button" class="btn-note save full" style="margin:0 0 12px" onclick="openSalt()">💧 Salzwasser-Rechner: ansetzen und aufsalzen</button>' : ''}<div class="detail-h">Empfehlung</div>${it ? recItemHtml(it, rd) : '<div class="rec-meta">✅ Der letzte Wert liegt im Sollbereich, keine Maßnahme nötig.</div>'}`;
+                <div class="detail-h">Empfehlung</div>${it ? recItemHtml(it, rd) : '<div class="rec-meta">✅ Der letzte Wert liegt im Sollbereich, keine Maßnahme nötig.</div>'}`;
         }
 
         function saveRecord(e) {
@@ -3479,7 +3479,7 @@
                     ${age > 14 ? `<div class="rec-warn">Diese Messung ist ${age} Tage alt. Bitte erst nachmessen.</div>` : ''}
                     ${P.border ? `<div class="rec-warn">${P.border}</div>` : ''}
                     <div class="rec-sec"><b>Einordnung</b><br>${kb.ein}</div>
-                    ${it.k === 'sal' ? '<button type="button" class="btn-note save full" onclick="openSalt()">💧 Salzwasser-Rechner öffnen</button>' : ''}
+                    
                     <div class="rec-sec"><b>Mögliche Ursachen</b><br>${kb.ursache}</div>
                     <div class="rec-sec"><b>Was du tun kannst</b><br>${kb.massn}</div>
                     ${kb.plus ? `<div class="rec-sec"><b>Zusätzlich empfohlen</b><ul class="rec-plus">${kb.plus.map(x => `<li>${x}</li>`).join('')}</ul></div>` : ''}
@@ -3984,7 +3984,7 @@
             return `<div class="step"><div class="step-h">Aufsalzen mit Konzentrat 1 + 2</div>
                 <div class="gt-row">${dateT}
                 <label class="gt"><span class="gt-l">Ist <em>psu</em></span><span class="gt-v"><input type="number" step="any" inputmode="decimal" id="cc_sal_up" value="${lv ? r3(lv.v) : ''}" placeholder="–" aria-label="Ist-Wert" oninput="saltDoseShow()"></span></label>
-                <label class="gt"><span class="gt-l">Ziel <em>psu</em></span><span class="gt-v"><input type="number" step="any" inputmode="decimal" id="ct_sal_up" value="${r3(tgt)}" placeholder="–" aria-label="Zielwert" oninput="saltDoseShow()"></span></label></div>
+                <label class="gt"><span class="gt-l">Ziel <em>psu</em></span><span class="gt-v"><input type="number" step="any" inputmode="decimal" id="ct_sal_up" value="35" placeholder="–" aria-label="Zielwert" oninput="saltDoseShow()"></span></label></div>
                 <div class="gt-res"><div class="calc-res" id="cr_sal_up"></div></div>
                 <div class="rec-meta">Für ${fmtNum(V)} L Nettovolumen, nach deinem Rezept (${fmtNum(saltCfg.k1)} / ${fmtNum(saltCfg.k2)} ml je ${fmtNum(saltTotalL())} L bei ${fmtNum(saltCfg.psu)} psu). Langsam in mehreren Portionen zugeben.</div>
                 <button type="button" class="btn-note save full big" onclick="saltDoseAdd()">Aufsalzen eintragen</button></div>`;
@@ -4093,7 +4093,6 @@
                 const p = appSettings.products[slot] || {}, cfg = thresholds[k] || { label: 'All4Reef', unit: '' };
                 const title = isAio ? '🧪 All4Reef (A4R)' : `${cfg.label} · ${dir === 'up' ? '⬆️ erhöhen' : '⬇️ senken'}`;
                 let h = `<div class="pd-head"><button type="button" class="back-btn" onclick="closeProd()">‹ Zurück</button><div class="pd-title" style="color:${paramColors[k]}">${title}</div></div>`;
-                if (k === 'sal') h += '<button type="button" class="btn-note save full" style="margin:0 0 10px" onclick="openSalt()">💧 Salzwasser-Rechner (Absolute Ocean u. a.)</button>';
                 if (slot === 'sal_up') {
                     h += saltDoseHtml();
                 } else if (isAio) {
