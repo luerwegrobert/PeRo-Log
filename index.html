@@ -1075,14 +1075,14 @@
         <button type="button" class="nav-item active" data-tab="dashboard" onclick="navGo('dashboard')"><span class="ico" data-ico="grid"></span><span>Übersicht</span></button>
         <button type="button" class="nav-item" data-tab="input" onclick="navGo('input')"><span class="ico" data-ico="plus"></span><span>Messen</span></button>
         <button type="button" class="nav-item" data-tab="dosing" onclick="navGo('dosing')"><span class="ico" data-ico="flask"></span><span>Dosieren</span></button>
-        <button type="button" class="nav-item" data-tab="rec" onclick="navGo('rec')"><span class="ico" data-ico="bulb"></span><span>Tipps</span><i class="nav-badge" id="navBadgeRec"></i></button>
+        <button type="button" class="nav-item" data-tab="salt" onclick="navGo('salt')"><span class="ico" data-ico="drop"></span><span>Salzwasser</span></button>
         <button type="button" class="nav-item" data-tab="more" onclick="openMore()"><span class="ico" data-ico="dots"></span><span>Mehr</span><i class="nav-badge" id="navBadgeMore"></i></button>
     </nav>
 
     <div class="more-sheet" id="moreSheet" onclick="if(event.target===this)closeMore()">
         <div class="more-card" role="dialog" aria-label="Mehr">
             <div class="more-grab"></div>
-            <button type="button" class="more-row" onclick="moreGo('salt')"><span class="ico" data-ico="drop"></span><span class="more-t">Salzwasser<small>Ansetzen, Wasserwechsel, Aufsalzen</small></span><span class="chev">›</span></button>
+            <button type="button" class="more-row" onclick="moreGo('rec')"><span class="ico" data-ico="bulb"></span><span class="more-t">Tipps<small>Empfehlungen zu deinen Werten</small></span><i class="nav-badge in" id="moreBadgeRec"></i><span class="chev">›</span></button>
             <button type="button" class="more-row" onclick="moreGo('rem')"><span class="ico" data-ico="clock"></span><span class="more-t">Erinnerungen<small>Messungen, Aufgaben, Hinweise</small></span><i class="nav-badge in" id="moreBadgeRem"></i><span class="chev">›</span></button>
             <button type="button" class="more-row" onclick="moreGo('hist')"><span class="ico" data-ico="list"></span><span class="more-t">Historie<small>Alle Einträge und Notizen</small></span><span class="chev">›</span></button>
             <button type="button" class="more-row" onclick="moreGo('targets')"><span class="ico" data-ico="target"></span><span class="more-t">Sollwerte<small>Zielbereiche anpassen</small></span><span class="chev">›</span></button>
@@ -1407,11 +1407,14 @@
             if (!curSub) setTimeout(() => { if (myChart) myChart.update(); updateChart(); }, 50);
             window.scrollTo({ top: 0 });
         }
+        const badgeCnt = {};
         function setBadge(id, n) {
             const b = document.getElementById(id); if (!b) return; b.textContent = n; b.style.display = n ? 'block' : 'none';
-            const mir = { badgeRec: 'navBadgeRec', badgeRem: 'navBadgeMore' }[id];
-            if (mir) { const nb = document.getElementById(mir); if (nb) { nb.textContent = n; nb.style.display = n ? 'block' : 'none'; } }
-            if (id === 'badgeRem') { const mb = document.getElementById('moreBadgeRem'); if (mb) { mb.textContent = n; mb.style.display = n ? 'inline-block' : 'none'; } }
+            badgeCnt[id] = n;
+            const tot = (badgeCnt.badgeRec || 0) + (badgeCnt.badgeRem || 0), nb = document.getElementById('navBadgeMore');
+            if (nb) { nb.textContent = tot; nb.style.display = tot ? 'block' : 'none'; }
+            const m = { badgeRem: 'moreBadgeRem', badgeRec: 'moreBadgeRec' }[id], mb = m && document.getElementById(m);
+            if (mb) { mb.textContent = n; mb.style.display = n ? 'inline-block' : 'none'; }
         }
         const ICONS = {
             drop: '<path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/><path d="M9.5 14.5a2.5 2.5 0 0 0 2.5 2.5"/>',
@@ -1430,8 +1433,7 @@
         function updateNav() {
             const cur = document.querySelector('.tab-content.active'), t = cur ? cur.id : 'dashboard';
             let a = t;
-            if (t === 'dashboard' && curSub === 'rec') a = 'rec';
-            else if ((t === 'dashboard' && curSub) || t === 'targets' || t === 'salt') a = 'more';
+            if ((t === 'dashboard' && curSub) || t === 'targets') a = 'more';
             document.querySelectorAll('.nav-item').forEach(b => b.classList.toggle('active', b.dataset.tab === a));
             const bar = document.getElementById('pageBar');
             if (bar) {
