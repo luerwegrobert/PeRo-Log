@@ -1143,6 +1143,18 @@
         #timerBox .tm-title { font-size: 1rem; } #timerBox .tm-presets button { white-space: nowrap; }
         #timerBox .tm-custom { grid-column: 2; grid-row: 1; justify-content: flex-end; }
         #timerBox .tm-custom .tm-main { flex: 0 1 auto; min-width: 90px; }
+        /* Countdown v2: 1-7 Min + freie Eingabe */
+        #timerBox .timer-panel { grid-template-columns: auto 1fr; }
+        #timerBox .tm-presets { grid-column: 1 / -1; grid-row: 2; grid-template-columns: repeat(7, 1fr); }
+        #timerBox .tm-presets button { font-size: 0.85rem; font-weight: 700; padding: 5px 0; }
+        #timerBox .tm-presets::before { content: none; }
+        #timerBox .tm-custom { display: flex !important; grid-column: 2; grid-row: 1; justify-content: flex-end; gap: 5px; }
+        #timerBox .tm-custom input, #timerBox .tm-custom > span { display: inline-block !important; }
+        #timerBox .tm-custom input { width: 46px; padding: 5px 2px; font-size: 16px; border-radius: 10px; }
+        #timerBox .tm-custom > span { color: var(--text-muted); }
+        #timerBox .tm-custom .tm-main { min-width: 0; padding: 6px 10px; }
+        #timerBox .timer-panel.act .tm-presets, #timerBox .timer-panel.act .tm-custom input, #timerBox .timer-panel.act .tm-custom > span { display: none !important; }
+        #timerBox .tm-custom input::placeholder { font-size: 12px; } #timerBox .tm-custom input { width: 50px; text-align: center; }
 </style>
 </head>
 <body>
@@ -2995,12 +3007,7 @@
         function tmCardHtml(i) {
             return `<div class="glass-panel timer-panel" id="timerPanel${i}" style="display:none;">
                 <div class="tm-top"><span class="tm-title" id="tmTitle${i}">⏱️</span><span class="tm-display" id="tmDisplay${i}">00:00</span></div>
-                <div class="tm-presets">
-                    <button type="button" onclick="tmStart(${i}, 60)">1 Min</button>
-                    <button type="button" onclick="tmStart(${i}, 180)">3 Min</button>
-                    <button type="button" onclick="tmStart(${i}, 300)">5 Min</button>
-                    <button type="button" onclick="tmStart(${i}, 420)">7 Min</button>
-                </div>
+                <div class="tm-presets"><button type="button" onclick="tmStart(${i}, 60)">1</button><button type="button" onclick="tmStart(${i}, 120)">2</button><button type="button" onclick="tmStart(${i}, 180)">3</button><button type="button" onclick="tmStart(${i}, 240)">4</button><button type="button" onclick="tmStart(${i}, 300)">5</button><button type="button" onclick="tmStart(${i}, 360)">6</button><button type="button" onclick="tmStart(${i}, 420)">7</button></div>
                 <div class="tm-custom">
                     <input type="number" id="tmMin${i}" class="input-styled" min="0" max="999" inputmode="numeric" placeholder="Min">
                     <span>:</span>
