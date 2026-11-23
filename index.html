@@ -1127,6 +1127,22 @@
         .gt-res2 { padding: 4px 12px; border-radius: 14px; background: rgba(92,201,222,0.08); border: 1px dashed rgba(92,201,222,0.35); margin-bottom: 8px; }
         .gt-kv { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; padding: 8px 0; } .gt-kv + .gt-kv { border-top: 1px solid rgba(92,201,222,0.15); }
         .gt-kv span { font-size: 0.88rem; color: #cfeaf0; } .gt-kv b { font-size: 1.15rem; color: #4fe0b0; white-space: nowrap; } .gt-msg { padding: 8px 0; font-size: 0.85rem; color: var(--text-muted); }
+        /* Countdown: dezente Leiste */
+        #timerBox { margin-bottom: 10px; }
+        #timerBox .timer-panel { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 6px 12px; padding: 8px 12px; border-radius: 16px; background: rgba(92,201,222,0.05); border: 1px solid rgba(92,201,222,0.22); box-shadow: none; margin-bottom: 6px; }
+        #timerBox .tm-top { margin: 0; gap: 8px; justify-content: flex-start; }
+        #timerBox .tm-title { font-size: 0.7rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+        #timerBox .tm-display { font-size: 1.15rem; font-weight: 700; letter-spacing: 0; }
+        #timerBox .tm-presets { gap: 5px; } #timerBox .tm-presets button { padding: 5px 2px; font-size: 0.78rem; border-radius: 10px; border-color: rgba(92,201,222,0.3); background: rgba(92,201,222,0.07); color: #bfeaf3; }
+        #timerBox .tm-custom { grid-column: 1 / -1; margin: 0; display: none; }
+        #timerBox .timer-panel.act .tm-custom { display: flex; }
+        #timerBox .tm-custom input, #timerBox .tm-custom > span { display: none; }
+        #timerBox .tm-custom button { padding: 6px 8px; font-size: 0.82rem; border-radius: 10px; }
+        #timerBox .timer-panel.act .tm-presets { display: none; }
+        #timerBox .timer-panel.act { grid-template-columns: auto 1fr; }
+        #timerBox .tm-title { font-size: 1rem; } #timerBox .tm-presets button { white-space: nowrap; }
+        #timerBox .tm-custom { grid-column: 2; grid-row: 1; justify-content: flex-end; }
+        #timerBox .tm-custom .tm-main { flex: 0 1 auto; min-width: 90px; }
 </style>
 </head>
 <body>
@@ -1350,7 +1366,7 @@
 
         <!-- INPUT TAB -->
         <div id="input" class="tab-content">
-            <div id="timerBox" style="display:none"></div>
+            <div id="timerBox"></div>
             <div class="glass-panel form-container">
                 <div class="type-toggle-container">
                     <div id="toggleHome" class="type-toggle active" onclick="setRecordType('Heimtest')">🏠 Heim-Wassertest</div>
@@ -2978,7 +2994,7 @@
         }
         function tmCardHtml(i) {
             return `<div class="glass-panel timer-panel" id="timerPanel${i}" style="display:none;">
-                <div class="tm-top"><span class="tm-title" id="tmTitle${i}">⏱️ Countdown</span><span class="tm-display" id="tmDisplay${i}">00:00</span></div>
+                <div class="tm-top"><span class="tm-title" id="tmTitle${i}">⏱️</span><span class="tm-display" id="tmDisplay${i}">00:00</span></div>
                 <div class="tm-presets">
                     <button type="button" onclick="tmStart(${i}, 60)">1 Min</button>
                     <button type="button" onclick="tmStart(${i}, 180)">3 Min</button>
@@ -3126,9 +3142,10 @@
                 panel.style.display = vis[i] ? '' : 'none';
                 const ms = t.state === 'run' ? Math.max(0, t.end - Date.now()) : (t.state === 'pause' ? t.left : (t.state === 'done' ? 0 : t.total));
                 document.getElementById('tmDisplay' + i).textContent = tmFmt(ms);
-                document.getElementById('tmTitle' + i).textContent = shown > 1 ? `⏱️ Countdown ${i + 1}` : '⏱️ Countdown';
+                document.getElementById('tmTitle' + i).textContent = shown > 1 ? `⏱️ ${i + 1}` : '⏱️';
                 panel.classList.toggle('run', t.state === 'run');
                 panel.classList.toggle('done', t.state === 'done');
+                panel.classList.toggle('act', t.state !== 'idle');
                 document.getElementById('tmMain' + i).textContent = { idle: '▶ Start', run: '⏸ Pause', pause: '▶ Weiter', done: '⏹ Beenden' }[t.state];
             });
             const box = document.getElementById('timerBox');
